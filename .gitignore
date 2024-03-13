@@ -1,0 +1,8 @@
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+for_zephyr/build
+for_zephyr/compile_commands.json
+**/.cache
+
+

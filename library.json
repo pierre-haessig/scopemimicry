@@ -1,0 +1,17 @@
+{ 
+    "name": "ScopeMimicry",
+    "version": "0.1",
+    "description": "a try to mimicry an oscilloscope behaviour in an embedded target for OwnTech applications",
+    "keywords": "OwnTech,",
+    "authors": {
+        "name": "Regis Ruelland",
+        "email": "regis.ruelland@laas.fr"
+    },
+    "license": "LGPL-2.0-only",
+    "frameworks": "zephyr",
+    "headers": ["ScopeMimicry.h"],
+    "exclude": ["CMakeLists.txt", "pl_df.py", "for_zephyr/**"],
+    "src_filter": ["-<src/main.cpp"]
+
+
+}
