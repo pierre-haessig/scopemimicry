@@ -1,12 +1,16 @@
 #include "ScopeMimicry.h"
+#include <stdio.h>
 
 ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel): 
     _length(length),
     _nb_channel(nb_channel),
     _acq_counter(0),
     _effective_chan_number(0),
+    _old_trigg_value(false),
     _trigged(false),
     _delay(0),
+    _delay_complement(length),
+    _trigged_counter(length),
     _final_idx(length-1)
 {
     _memory = new float[_length*_nb_channel]; 
@@ -41,25 +45,30 @@ void ScopeMimicry::connectChannel(float &channel, const char name[]) {
  * activated
  */
 uint16_t ScopeMimicry::acquire() {
+    bool trigg_value = (*_triggFunc)();
+    // compute trigger
+    if (!_old_trigg_value && trigg_value && !_trigged) {
+        _trigged = true;
+        _trigged_counter = (_acq_counter + _delay_complement - 1) % _length;
+    }
+    _old_trigg_value = trigg_value; 
 
     if (!_trigged) {
-        _trigged =  _triggFunc();
-        _trigged_counter = 0;
-    } else {
-        _trigged_counter++;
+        _trigged_counter = -1;
     }
-
-    if (_trigged_counter < _delay_complement) {
+    if (_acq_counter != _trigged_counter) {
+        _acq_counter = (_acq_counter + 1)% _length;
         for (int k_ch=0; k_ch < _effective_chan_number; k_ch++) {
             _memory[(_acq_counter * _nb_channel) + k_ch] = *(_channels[k_ch]);
         }
-        _acq_counter = (_acq_counter + 1)% _length;
+        if (_trigged) 
+            return 1;
+        else 
+            return 0;
     } else {
         _final_idx = _acq_counter;
+        return 2;
     }
-    uint16_t status= (_trigged_counter*100) / _delay_complement;
-
-    return  (status < 100) ? status:100;
 }
 
 /**
@@ -71,15 +80,15 @@ void ScopeMimicry::set_delay(float32_t d) {
     if (d < 0.0) _delay = 0.0;
     else if (d >= 1.0) _delay = _length;
     else _delay = d *_length;
-    _delay_complement = _length - _delay + 1; 
+    _delay_complement = _length - _delay; 
 }
 
 /**
  * @brief reset the trigger and enable to record new data
  */
 void ScopeMimicry::start() {
-    _acq_counter = 0;
     _trigged = false;
+    _old_trigg_value = false;
 }
 
 uint16_t ScopeMimicry::get_final_idx() {
@@ -115,6 +124,11 @@ uint16_t ScopeMimicry::get_nb_channel() {
 
 bool ScopeMimicry::has_trigged() {
     return _trigged;
+}
+
+uint16_t ScopeMimicry::status() {
+    return (uint16_t)((_trigged_counter*100) / _delay_complement);
+
 }
 
 const char *ScopeMimicry::get_channel_name(uint16_t idx) {

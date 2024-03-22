@@ -6,6 +6,7 @@ set(CXX_STANDARD_REQUIRED ON)
 set(CXX_STANDARD C++20)
 set(BUILD_TYPE debug)
 set(CMAKE_CXX_FLAGS "-std=c++2a -ggdb")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(mylib ../src/ScopeMimicry.cpp)
 target_include_directories(mylib PRIVATE ../src)

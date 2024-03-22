@@ -79,6 +79,13 @@ public:
      * @return 
      */
     bool has_trigged();
+
+    /**
+     * @brief return percentage of filling memory
+     *
+     * @return percentage of filling memory in % (integer) 
+     */
+    uint16_t status();
     const char* get_channel_name(uint16_t idx);
 
 private:
@@ -86,6 +93,7 @@ private:
     uint16_t _nb_channel;
     uint16_t _acq_counter;
     uint16_t _effective_chan_number;
+    bool _old_trigg_value;
     bool _trigged;
     uint16_t _delay;
 
@@ -95,10 +103,10 @@ private:
     float32_t *_memory;
 
     uint16_t _decimation;
-    bool (*_triggFunc)();
     uint16_t _delay_complement;
     uint16_t _trigged_counter;
     uint16_t _final_idx;
+    bool (*_triggFunc)();
 };
 
 

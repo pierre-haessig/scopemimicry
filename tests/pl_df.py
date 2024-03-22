@@ -8,7 +8,6 @@ def to_float(s):
     return [ struct.unpack('>f', bytes.fromhex(d))[0] for d in s]
 
 # we get only the two first columns
-df = df.iloc[:, :2]
 df = df.apply(to_float)
 df.plot()
 plt.show()

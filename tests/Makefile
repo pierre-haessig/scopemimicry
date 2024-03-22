@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/tests
+CMAKE_SOURCE_DIR = /home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/tests
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/tests
+CMAKE_BINARY_DIR = /home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/tests
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/tests/CMakeFiles /home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/tests//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/tests/CMakeFiles /home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/tests//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/tests/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/tests/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -142,32 +142,32 @@ test_scope/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_scope.dir/build.make CMakeFiles/test_scope.dir/build
 .PHONY : test_scope/fast
 
-home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.o: home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.o
-.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.o
+home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.o: home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.o
+.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.o
 
 # target to build an object file
-home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mylib.dir/build.make CMakeFiles/mylib.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_scope.dir/build.make CMakeFiles/test_scope.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.o
-.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.o
+home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mylib.dir/build.make CMakeFiles/mylib.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_scope.dir/build.make CMakeFiles/test_scope.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.o
+.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.o
 
-home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.i: home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.i
-.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.i
+home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.i: home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.i
+.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.i
 
 # target to preprocess a source file
-home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mylib.dir/build.make CMakeFiles/mylib.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_scope.dir/build.make CMakeFiles/test_scope.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.i
-.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.i
+home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mylib.dir/build.make CMakeFiles/mylib.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_scope.dir/build.make CMakeFiles/test_scope.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.i
+.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.i
 
-home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.s: home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.s
-.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.s
+home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.s: home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.s
+.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.s
 
 # target to generate assembly for a file
-home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mylib.dir/build.make CMakeFiles/mylib.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_scope.dir/build.make CMakeFiles/test_scope.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.s
-.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.cpp.s
+home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mylib.dir/build.make CMakeFiles/mylib.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_scope.dir/build.make CMakeFiles/test_scope.dir/home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.s
+.PHONY : home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -203,9 +203,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... mylib"
 	@echo "... test_scope"
-	@echo "... home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.o"
-	@echo "... home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.i"
-	@echo "... home/rruelland/Documents/owntech_softwares/owntech-foundation/recorder/src/ScopeMimicry.s"
+	@echo "... home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.o"
+	@echo "... home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.i"
+	@echo "... home/rruelland/Documents/owntech_softwares/owntech-foundation/scopemimicry/src/ScopeMimicry.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
