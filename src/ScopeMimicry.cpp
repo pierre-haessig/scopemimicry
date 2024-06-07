@@ -1,7 +1,8 @@
 #include "ScopeMimicry.h"
 #include <stdio.h>
+#include <string.h>
 
-ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel): 
+ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel):
     _length(length),
     _nb_channel(nb_channel),
     _acq_counter(0),
@@ -72,7 +73,7 @@ uint16_t ScopeMimicry::acquire() {
 }
 
 /**
- * @brief define delay to record data before trigger between. delay is in [0, 1] 
+ * @brief define a delay to record data before the trigg. delay is in [0, 1] 
  *
  * @param d delay
  */
@@ -84,7 +85,7 @@ void ScopeMimicry::set_delay(float32_t d) {
 }
 
 /**
- * @brief reset the trigger and enable to record new data
+ * @brief reset the trigger and enable to record new data_dumped
  */
 void ScopeMimicry::start() {
     _trigged = false;
@@ -94,7 +95,6 @@ void ScopeMimicry::start() {
 uint16_t ScopeMimicry::get_final_idx() {
     return _final_idx;
 }
-
 
 /**
  * @brief get a function without arguments which should return a boolean to enable
@@ -139,3 +139,75 @@ const char *ScopeMimicry::get_channel_name(uint16_t idx) {
         return "BadIdx";
     }
 }
+
+/**
+ * @brief get one value of one channel
+ *
+ * @param index : value in the table between [0, length-1]
+ * @param channel_idx :channel number.
+ * @return float value.
+ */
+float32_t ScopeMimicry::get_channel_value(uint32_t index, uint32_t channel_idx) {
+    /* to be sure we are not outside the buffer */
+    index = (index) % _length;
+    return _memory[(index * _nb_channel) + channel_idx];
+}
+
+void ScopeMimicry::reset_dump() {
+	dump_state = initialized;
+}
+
+enum e_dump_state ScopeMimicry::get_dump_state() {
+	return dump_state;
+}
+
+char* ScopeMimicry::dump_datas()
+{
+	uint16_t n_datas = _length * _nb_channel;
+	/* reset char_name */
+	char_name[0] = '\0';
+	switch (dump_state) {
+		case initialized:
+			data_dumped = hash;
+			_idx_name = 0;
+			_idx_datas = 0;
+			dump_state = names;
+		break;
+		case names:
+			if (_idx_name < this->get_nb_channel()) 
+			{
+				strcat(char_name,get_channel_name(_idx_name));
+				strcat(char_name, ",");
+				data_dumped = char_name;
+				_idx_name +=1;
+			}
+			else
+			{
+				data_dumped = (char *) "\n";
+				dump_state = final_idx;
+			}
+		break;
+		case final_idx:
+			sprintf(char_name, "%c %d\n", '#', get_final_idx());
+			data_dumped = char_name;
+			dump_state = datas;
+		break;
+		case datas:
+			if (_idx_datas < n_datas-1)
+			{
+				sprintf(char_data, "%08x\n", *((uint32_t *) _memory + _idx_datas));
+				data_dumped = char_data;
+				_idx_datas += 1;
+			}
+			else
+			{
+				dump_state = finished;
+			}
+		break;
+		case finished:
+			data_dumped = nullchar;
+		break;
+		}
+	return data_dumped;
+}
+
