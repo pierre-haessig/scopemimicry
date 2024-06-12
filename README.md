@@ -9,24 +9,29 @@ ScopeMimicry Library allows to capture live data and variables.
 Add the following to `lib_deps` in `platformio.ini`  
 ```scopemimicry = https://github.com/owntech-foundation/scopemimicry.git```  
 
-##  Include the library 
+##  Include the library  
+
 ```cpp
-#include "ScopeMimicry.h"```
+#include "ScopeMimicry.h"
+```
 
 ## ScopeMimicry Usage
 
 ### Connecting Channels
 
 Create your scope object  
+
 ```cpp
-ScopeMimicry scope(sample_lenght, number_of_channels);```
+ScopeMimicry scope(sample_lenght, number_of_channels);
+```
 
 - Sample lenght is the number of data points per channel.  
 - Number of channel is the total number of channel acquired by the scope.
   
 For example :
 ```cpp
-ScopeMimicry scope(512, 4);```  
+ScopeMimicry scope(512, 4);
+```  
 Defines a scope with 4 channels and 512 data points per channel.
 
 Channels are connected to variables using:
@@ -43,7 +48,8 @@ Make sure to connect as many channels as the number of channels set up in scope 
 Acquisition can be launched using :  
 
 ```cpp
-scope.acquire();```
+scope.acquire();
+```
 
 ### Setting Triggers and Delays
 
@@ -65,9 +71,11 @@ Will trigger the scope when `myVariable = 1`
 Once the trigger function created, set the trigger function
 ```cpp
 scope.set_trigger(&a_trigger);
+```
 
 A delay can be added to acquire a given amount of data before the trigger instant.
 `delay` should be a float between `0` and `1`.
+```cpp
 scope.set_delay(0.0F);
 ```
 
