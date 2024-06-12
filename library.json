@@ -7,7 +7,7 @@
         "name": "Regis Ruelland",
         "email": "regis.ruelland@laas.fr"
     },
-    "license": "LGPL-2.0-only",
+    "license": "LGPL-2.1-only",
     "frameworks": "zephyr",
     "headers": ["ScopeMimicry.h"],
     "exclude": ["CMakeLists.txt", "pl_df.py", "for_zephyr/**"],
