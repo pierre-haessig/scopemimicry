@@ -1,4 +1,4 @@
-#  Using ScopeMimicry with OwnTech Core
+# ScopeMimicry
 
 ScopeMimicry Library allows to capture live data and variables.
 
