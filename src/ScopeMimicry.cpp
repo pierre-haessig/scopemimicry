@@ -14,7 +14,7 @@ ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel):
     _trigged_counter(length),
     _final_idx(length-1)
 {
-    _memory = new float[_length*_nb_channel]; 
+    _memory = new float[_length*_nb_channel]();
     _names = new const char*[nb_channel];
     _channels = new float32_t *[nb_channel];
 };
