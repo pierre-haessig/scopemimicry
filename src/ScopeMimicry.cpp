@@ -29,7 +29,7 @@ ScopeMimicry::~ScopeMimicry() {
  * it is necessary.
  *
  * @param channel : reference to a static variable
- * @param name: name of the variable you want to have after retrieving. 
+ * @param name: name of the variable you want to have after retrieving.
  */
 void ScopeMimicry::connectChannel(float &channel, const char name[]) {
     if (_effective_chan_number < _nb_channel) {
@@ -52,7 +52,7 @@ uint16_t ScopeMimicry::acquire() {
         _trigged = true;
         _trigged_counter = (_acq_counter + _delay_complement - 1) % _length;
     }
-    _old_trigg_value = trigg_value; 
+    _old_trigg_value = trigg_value;
 
     if (!_trigged) {
         _trigged_counter = -1;
@@ -62,9 +62,9 @@ uint16_t ScopeMimicry::acquire() {
         for (int k_ch=0; k_ch < _effective_chan_number; k_ch++) {
             _memory[(_acq_counter * _nb_channel) + k_ch] = *(_channels[k_ch]);
         }
-        if (_trigged) 
+        if (_trigged)
             return 1;
-        else 
+        else
             return 0;
     } else {
         _final_idx = _acq_counter;
@@ -73,7 +73,7 @@ uint16_t ScopeMimicry::acquire() {
 }
 
 /**
- * @brief define a delay to record data before the trigg. delay is in [0, 1] 
+ * @brief define a delay to record data before the trigg. delay is in [0, 1]
  *
  * @param d delay
  */
@@ -81,7 +81,7 @@ void ScopeMimicry::set_delay(float32_t d) {
     if (d < 0.0) _delay = 0.0;
     else if (d >= 1.0) _delay = _length;
     else _delay = d *_length;
-    _delay_complement = _length - _delay; 
+    _delay_complement = _length - _delay;
 }
 
 /**
@@ -100,7 +100,7 @@ uint16_t ScopeMimicry::get_final_idx() {
  * @brief get a function without arguments which should return a boolean to enable
  * recording
  *
- * @param func: handle to a function which shall return a boolean. 
+ * @param func: handle to a function which shall return a boolean.
  */
 void ScopeMimicry::set_trigger(bool (*func)()) {
     _triggFunc = func;
@@ -174,7 +174,7 @@ char* ScopeMimicry::dump_datas()
 			dump_state = names;
 		break;
 		case names:
-			if (_idx_name < this->get_nb_channel()) 
+			if (_idx_name < this->get_nb_channel())
 			{
 				strcat(char_name,get_channel_name(_idx_name));
 				strcat(char_name, ",");
@@ -188,7 +188,7 @@ char* ScopeMimicry::dump_datas()
 			}
 		break;
 		case final_idx:
-			sprintf(char_name, "%c %d\n", '#', get_final_idx());
+			sprintf(char_name, "## %d\n", get_final_idx());
 			data_dumped = char_name;
 			dump_state = datas;
 		break;
@@ -210,4 +210,3 @@ char* ScopeMimicry::dump_datas()
 		}
 	return data_dumped;
 }
-
