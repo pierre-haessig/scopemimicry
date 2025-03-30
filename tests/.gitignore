@@ -1,0 +1,4 @@
+Makefile
+compile_commands.json
+libmylib.a
+test_scope
