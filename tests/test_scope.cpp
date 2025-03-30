@@ -35,6 +35,7 @@ struct ScopeInput2ch {
 
 /* Scope acquisition test data for expected output  */
 struct ScopeAcqResults {
+    uint16_t final_idx; // index of the last acquisition in the memory
     uint16_t *status;// point to acquisition status (size = test sequence length)
     float32_t *memory; // pointer to expected scope memory content (size nb_channel * scope length)
 };
@@ -68,6 +69,12 @@ bool test_scope_acquire(uint16_t length, float32_t delay,
     }
 
     // Compare to expected results
+    // 0. Index of the last acquisition in the memory
+    if (scope.get_final_idx() != out_exp.final_idx) {
+        success = false;
+        printf("- Final index mismatch: is %d, expected %d\n",
+            scope.get_final_idx(), out_exp.final_idx);
+    }
     // 1. Acquisition status sequence
     for (int k=0; k<in.length; k++) {
         if (status_seq[k] != out_exp.status[k]) {
@@ -126,6 +133,7 @@ bool test_scope_acquire1() {
         12, 22, 10, 20, 11, 21,
     };
     ScopeAcqResults out_exp = {
+        .final_idx = 0,
         .status = status_seq,
         .memory = memory_exp
     };
