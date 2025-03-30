@@ -11,10 +11,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_library(mylib ../src/ScopeMimicry.cpp)
 target_include_directories(mylib PRIVATE ../src)
 set(SRCS
-    main.cpp
+    test_scope.cpp
     ../src/ScopeMimicry.cpp
     )
-    
+
 set(HEADERS
     ../src/ScopeMimicry.h
     )
