@@ -103,6 +103,7 @@ bool test_scope_acquire(uint16_t length, float32_t delay,
     return success;
 }
 
+// Base test. Bug: the last instant is missed
 bool test_scope_acquire1() {
     printf("Scope acquisition test 1...\n");
     bool success;
@@ -142,6 +143,169 @@ bool test_scope_acquire1() {
     return success;
 }
 
+// Base variant, with trigger at 2nd instant
+bool test_scope_acquire2() {
+    printf("Scope acquisition test 2 (trig k=1)...\n");
+    bool success;
+
+    // Scope parameters
+    const uint16_t length = 3;
+    const int n_channels = 2;
+    float32_t delay = 0.0;
+
+    // Input test sequences
+    const int length_seq = 5;
+    bool start_seq[length_seq]    = { 1,  0,  0,  0,  0};
+    bool trig_seq[length_seq]     = { 0,  1,  0,  0,  0};
+    float32_t ch1_seq[length_seq] = {10, 11, 12, 13, 14};
+    float32_t ch2_seq[length_seq] = {20, 21, 22, 23, 24};
+
+    ScopeInput2ch in = {
+        .length = length_seq,
+        .start = start_seq,
+        .trig = trig_seq,
+        .ch1 = ch1_seq,
+        .ch2 = ch2_seq
+    };
+
+    // Expected output:
+    uint16_t status_seq[length_seq] = {0,1,1,1,2};
+    float32_t memory_exp[length*n_channels] = {
+        12, 22, 13, 23, 11, 21,
+    };
+    ScopeAcqResults out_exp = {
+        .final_idx = 0,
+        .status = status_seq,
+        .memory = memory_exp
+    };
+
+    success = test_scope_acquire(length, delay, in, out_exp);
+    return success;
+}
+
+// Base variant, with trigger at 2nd instant + delay
+// -> expect result be like Base
+bool test_scope_acquire3() {
+    printf("Scope acquisition test 3 (trig k=1, delay=1)...\n");
+    bool success;
+
+    // Scope parameters
+    const uint16_t length = 3;
+    const int n_channels = 2;
+    float32_t delay = 0.4; // to get int delay=1
+
+    // Input test sequences
+    const int length_seq = 5;
+    bool start_seq[length_seq]    = { 1,  0,  0,  0,  0};
+    bool trig_seq[length_seq]     = { 0,  1,  0,  0,  0};
+    float32_t ch1_seq[length_seq] = {10, 11, 12, 13, 14};
+    float32_t ch2_seq[length_seq] = {20, 21, 22, 23, 24};
+
+    ScopeInput2ch in = {
+        .length = length_seq,
+        .start = start_seq,
+        .trig = trig_seq,
+        .ch1 = ch1_seq,
+        .ch2 = ch2_seq
+    };
+
+    // Expected output:
+    uint16_t status_seq[length_seq] = {0,1,1,2,2};
+    float32_t memory_exp[length*n_channels] = {
+        12, 22, 10, 20, 11, 21, // Same as Base test
+    };
+    ScopeAcqResults out_exp = {
+        .final_idx = 0,
+        .status = status_seq,
+        .memory = memory_exp
+    };
+
+    success = test_scope_acquire(length, delay, in, out_exp);
+    return success;
+}
+
+// Special bug for delay=100%: scope never stops!
+bool test_scope_acquire4() {
+    printf("Scope acquisition test 4 (100%% delay)...\n");
+    bool success;
+
+    // Scope parameters
+    const uint16_t length = 3;
+    const int n_channels = 2;
+    float32_t delay = 1.0;
+
+    // Input test sequences
+    const int length_seq = 7;
+    bool start_seq[length_seq]    = { 1,  0,  0,  0,  0,  0,  0};
+    bool trig_seq[length_seq]     = { 0,  0,  0,  1,  0,  0,  0};
+    float32_t ch1_seq[length_seq] = {10, 11, 12, 13, 14, 15, 16};
+    float32_t ch2_seq[length_seq] = {20, 21, 22, 23, 24, 25, 26};
+
+    ScopeInput2ch in = {
+        .length = length_seq,
+        .start = start_seq,
+        .trig = trig_seq,
+        .ch1 = ch1_seq,
+        .ch2 = ch2_seq
+    };
+
+    // Expected output:
+    uint16_t status_seq[length_seq] = {0,0,0, 2,2,2,2};
+    float32_t memory_exp[length*n_channels] = {
+        12, 22, 10, 20, 11, 21, // same as test 1 (trig k=0, no delay)
+    };
+    ScopeAcqResults out_exp = {
+        .final_idx = 0,
+        .status = status_seq,
+        .memory = memory_exp
+    };
+
+    success = test_scope_acquire(length, delay, in, out_exp);
+    return success;
+}
+
+// Test with restart: works, albeit with same bug as in Base
+bool test_scope_acquire5() {
+    printf("Scope acquisition test 5 (restart k=4)...\n");
+    bool success;
+
+    // Scope parameters
+    const uint16_t length = 3;
+    const int n_channels = 2;
+    float32_t delay = 0.0; // to get int delay=1
+
+    // Input test sequences
+    const int length_seq = 9;
+    bool start_seq[length_seq]    = { 1,  0,  0,  0,  1,  0,  0,  0,  0};
+    bool trig_seq[length_seq]     = { 1,  1,  1,  1,  1,  1,  1,  1,  1};
+    float32_t ch1_seq[length_seq] = {10, 11, 12, 13, 14, 15, 16, 17, 18};
+    float32_t ch2_seq[length_seq] = {20, 21, 22, 23, 24, 25, 26, 27, 28};
+
+    ScopeInput2ch in = {
+        .length = length_seq,
+        .start = start_seq,
+        .trig = trig_seq,
+        .ch1 = ch1_seq,
+        .ch2 = ch2_seq
+    };
+
+    // Expected output:
+    uint16_t status_seq[length_seq] = {1,1,1, 2, 1,1,1, 2,2};
+    float32_t memory_exp[length*n_channels] = {
+        //16, 26, 14, 24, 15, 25, true expected content
+        14, 24, 15, 25, 16, 26 // expected content when compensating for the fact that the firt acquisition stops too early
+    };
+    ScopeAcqResults out_exp = {
+        .final_idx = 2,
+        .status = status_seq,
+        .memory = memory_exp
+    };
+
+    success = test_scope_acquire(length, delay, in, out_exp);
+    return success;
+}
+
+
 /* Legacy test which runs the scope and then print memory content
 but doesn't compare against a reference
 */
@@ -163,7 +327,7 @@ void test_legacy() {
         t = k*Ts;
         Ilow1 = t*1000;
         Ilow2 = (k % 10)*0.1; // sawtooth 0 -> 0.9
-        if (k > 20) {
+        if (k > 20) { // FIXME: replace >20 by ==21
             scope.start();
         }
         uint16_t status = scope.acquire();
@@ -191,6 +355,10 @@ int main(void) {
     bool success = true;
     //test_legacy();
     success &= test_scope_acquire1();
+    success &= test_scope_acquire2();
+    success &= test_scope_acquire3();
+    success &= test_scope_acquire4();
+    success &= test_scope_acquire5();
 
     if (success) {
         printf("GLOBAL SUCCESS\n");
