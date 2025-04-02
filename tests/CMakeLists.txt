@@ -8,8 +8,8 @@ set(BUILD_TYPE debug)
 set(CMAKE_CXX_FLAGS "-std=c++2a -ggdb")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_library(mylib ../src/ScopeMimicry.cpp)
-target_include_directories(mylib PRIVATE ../src)
+add_library(Scope ../src/ScopeMimicry.cpp)
+target_include_directories(Scope PRIVATE ../src)
 set(SRCS
     test_scope.cpp
     ../src/ScopeMimicry.cpp

@@ -7,23 +7,6 @@
 
 #include "ScopeMimicry.h"
 
-static float32_t Ilow1;
-static float32_t Ilow2;
-
-const int n_channels = 2;
-
-bool trig_global;
-
-// crude trigger function which returns the global trig_global value
-bool trig_global_fun(void) {
-    return trig_global;
-}
-
-bool mytrigger(void) {
-    return true;
-    return (Ilow1 > 0.1);
-}
-
 /* Scope acquisition test input data*/
 struct ScopeInput2ch {
     int length;// length of test sequences
@@ -40,6 +23,12 @@ struct ScopeAcqResults {
     float32_t *memory; // pointer to expected scope memory content (size nb_channel * scope length)
 };
 
+bool trig_global; // trigger value returned by trig_global_fun()
+
+// crude trigger function which returns the global trig_global value
+bool trig_global_fun(void) {
+    return trig_global;
+}
 
 /*Test the Scope data acquisition phase on a test sequence
 */
@@ -306,34 +295,48 @@ bool test_scope_acquire5() {
 }
 
 
-/* Legacy test which runs the scope and then print memory content
-but doesn't compare against a reference
+/*** Scope demo ***/
+
+// Static variables the the scope acquisitions will read
+static float32_t Ilow1;
+static float32_t Ilow2;
+
+// trigger function for the demo
+bool mytrigger(void) {
+    return true;
+    return (Ilow1 > 0.1);
+}
+
+/* Runs scope acquisition and then print memory content
+This is a demo rather than a test because it doesn't compare the result against a reference
 */
-void test_legacy() {
+void scope_demo() {
+    printf("Scope acquisition demo...\n");
     float32_t t;
     const float32_t Ts = 1e-3; // sampling time (s)
     uint8_t *buffer;
     uint16_t buffer_size = 0;
     int length_sim = 40; // simulation length -> 40 ms
     uint16_t length = 10; // scope capture length
+    const int n_channels = 2;
     ScopeMimicry scope(length, n_channels);
+
     scope.connectChannel(Ilow1, "iLow1");
     scope.connectChannel(Ilow2, "iLow2");
     scope.set_trigger(&mytrigger);
-    //scope.set_delay(0.5);
-    //scope.start();
+    //scope.set_delay(0.5); // defaults to 0.0
+    //scope.start(); // not needed: automatic after first initialization
 
     for (int k=0; k<length_sim; k++)  {
         t = k*Ts;
         Ilow1 = t*1000;
         Ilow2 = (k % 10)*0.1; // sawtooth 0 -> 0.9
-        if (k > 20) { // FIXME: replace >20 by ==21
+        if (k == 20) {
             scope.start();
         }
         uint16_t status = scope.acquire();
         printf("k=%2d, t=%.3f: ", k, t);
         printf("Ilow1=%.1f (status=%d)\n", Ilow1, status);
-
     }
 
     buffer = scope.get_buffer();
@@ -352,8 +355,11 @@ void test_legacy() {
 }
 
 int main(void) {
+
+    scope_demo();
+
+    printf("\nScope acquisition tests...\n");
     bool success = true;
-    //test_legacy();
     success &= test_scope_acquire1();
     success &= test_scope_acquire2();
     success &= test_scope_acquire3();
