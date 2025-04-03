@@ -1,6 +1,10 @@
 /**
  * @file
- * @brief ScopeMimicry: mimic a digital scope inside the cpu with a ram array. 
+ * @brief ScopeMimicry: mimic a digital scope inside the cpu with a ram array.
+ * 
+ * @author Régis Ruelland <regis.ruelland@laas.fr>
+ * @author Jean Alinei <jean.alinei@laas.fr>
+ * @author Pierre Haessig <pierre.haessig@centralesupelec.fr>
  */
 
 #ifndef _SCOPEMIMICRY_H_

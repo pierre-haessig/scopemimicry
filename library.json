@@ -1,17 +1,25 @@
 { 
     "name": "ScopeMimicry",
-    "version": "0.1",
-    "description": "A library to mimic an oscilloscope behaviour in an embedded target for OwnTech applications",
-    "keywords": "OwnTech,",
-    "authors": {
-        "name": "Regis Ruelland",
-        "email": "regis.ruelland@laas.fr"
-    },
+    "version": "0.2",
+    "description": "An embedded oscilloscope library to record over time the value of variables in an embedded target for OwnTech applications",
+    "keywords": ["OwnTech", "oscilloscope", "record", "datalogger"],
+    "authors": [
+        {
+            "name": "Regis Ruelland",
+            "email": "regis.ruelland@laas.fr"
+        },
+        {
+            "name": "Jean Alinei",
+            "email": "jean.alinei@laas.fr"
+        },
+        {
+            "name": "Pierre Haessig",
+            "email": "pierre.haessig@centralesupelec.fr"
+        }
+    ],
     "license": "LGPL-2.1-only",
     "frameworks": "zephyr",
     "headers": ["ScopeMimicry.h"],
     "exclude": ["CMakeLists.txt", "pl_df.py", "for_zephyr/**"],
     "src_filter": ["-<src/main.cpp"]
-
-
 }
