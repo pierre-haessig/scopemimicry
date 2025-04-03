@@ -11,7 +11,7 @@ ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel):
     _nb_pretrig(0),
     _acq_state(ACQ_UNTRIG),
     _acq_count(0),
-    _mem_idx(1), // start writing data at idx=1 for test compatibility with previous acquisition state machine
+    _mem_idx(0),
     _trig_idx(0),
     _final_idx(length-1)
 {
@@ -38,7 +38,7 @@ bool ScopeMimicry::connectChannel(float &channel, const char name[]) {
     }
 }
 
-uint16_t ScopeMimicry::acquire() {
+ScopeAcqState ScopeMimicry::acquire() {
     bool trigg_value = (*_triggFunc)();
     // Aquisition status state machine, state change logic:
     if (_acq_state == ACQ_UNTRIG) {
@@ -100,7 +100,7 @@ void ScopeMimicry::set_pretrig_ratio(float r) {
 void ScopeMimicry::start() {
     _acq_state = ACQ_UNTRIG;
     _acq_count = 0;
-    _mem_idx = 1; // start writing data at idx=1 for test compatibility with previous acquisition state machine
+    _mem_idx = 0;
 }
 
 void ScopeMimicry::set_trigger(bool (*func)()) {
@@ -111,7 +111,7 @@ bool ScopeMimicry::has_trigged() {
     return _acq_state == ACQ_TRIG || _acq_state == ACQ_DONE;
 }
 
-ScopeAcqStatus ScopeMimicry::acq_state() {
+ScopeAcqState ScopeMimicry::acq_state() {
     return _acq_state;
 }
 

@@ -19,7 +19,7 @@ enum e_dump_state {
 };
 
 /*Scope acquisition state*/
-enum ScopeAcqStatus {
+enum ScopeAcqState {
 	ACQ_UNTRIG, // data being recorded, before trigger
 	ACQ_TRIG,   // data being recorded, after trigger
 	ACQ_DONE    // data recording finished
@@ -63,7 +63,7 @@ public:
 	 *
 	 * @return scope acquistion state (ACQ_UNTRIG, ACQ_TRIG or ACQ_DONE)
 	 */
-	uint16_t acquire();
+	ScopeAcqState acquire();
 	
 	/**
 	 * @brief get number of data samples recorded *before* trigger
@@ -107,7 +107,7 @@ public:
 	/**
 	 * @brief return data acquision state (ACQ_UNTRIG, ACQ_TRIG or ACQ_DONE)
 	 */
-	ScopeAcqStatus acq_state();
+	ScopeAcqState acq_state();
 	
 	/**
 	 * @brief memory index of the last data points recorded
@@ -197,7 +197,7 @@ private:
 
 	/* Variables for acquisition logic */
 	uint16_t _nb_pretrig; // number of samples to be recorded before trigger (parameter)
-	ScopeAcqStatus _acq_state; // data acquisition state
+	ScopeAcqState _acq_state; // data acquisition state
 	uint16_t _acq_count; // number of samples already recorded
 	uint16_t _mem_idx; // memory index where to record the *next* samples in memory
 	uint16_t _trig_idx; // memory index value when trigger happened (once triggered)

@@ -120,10 +120,10 @@ bool test_scope_acquire1() {
     // Expected output:
     uint16_t status_seq[length_seq] = {1,1,1,2,2};
     float32_t memory_exp[length*n_channels] = {
-        12, 22, 10, 20, 11, 21,
+        10, 20, 11, 21, 12, 22
     };
     ScopeAcqResults out_exp = {
-        .final_idx = 0,
+        .final_idx = 2,
         .status = status_seq,
         .memory = memory_exp
     };
@@ -160,10 +160,10 @@ bool test_scope_acquire2() {
     // Expected output:
     uint16_t status_seq[length_seq] = {0,1,1,1,2};
     float32_t memory_exp[length*n_channels] = {
-        12, 22, 13, 23, 11, 21,
+        13, 23, 11, 21, 12, 22
     };
     ScopeAcqResults out_exp = {
-        .final_idx = 1,
+        .final_idx = 0,
         .status = status_seq,
         .memory = memory_exp
     };
@@ -201,10 +201,10 @@ bool test_scope_acquire3() {
     // Expected output:
     uint16_t status_seq[length_seq] = {0,1,1,2,2};
     float32_t memory_exp[length*n_channels] = {
-        12, 22, 10, 20, 11, 21, // Same as Base test
+        10, 20, 11, 21, 12, 22 // Same as Base test
     };
     ScopeAcqResults out_exp = {
-        .final_idx = 0,
+        .final_idx = 2,
         .status = status_seq,
         .memory = memory_exp
     };
@@ -241,10 +241,10 @@ bool test_scope_acquire4() {
     // Expected output:
     uint16_t status_seq[length_seq] = {0,0,0, 2,2,2,2};
     float32_t memory_exp[length*n_channels] = {
-        12, 22, 10, 20, 11, 21, // same as test 1 (trig k=0, no nb_pretrig)
+        10, 20, 11, 21, 12, 22 // Same as Base test
     };
     ScopeAcqResults out_exp = {
-        .final_idx = 0,
+        .final_idx = 2,
         .status = status_seq,
         .memory = memory_exp
     };
@@ -281,8 +281,7 @@ bool test_scope_acquire5() {
     // Expected output:
     uint16_t status_seq[length_seq] = {1,1,1, 2, 1,1,1, 2,2};
     float32_t memory_exp[length*n_channels] = {
-        //16, 26, 14, 24, 15, 25, true expected content
-        14, 24, 15, 25, 16, 26 // expected content when compensating for the fact that the firt acquisition stops too early
+        14, 24, 15, 25, 16, 26
     };
     ScopeAcqResults out_exp = {
         .final_idx = 2,
@@ -334,9 +333,9 @@ void scope_demo() {
         if (k == 20) {
             scope.start();
         }
-        uint16_t status = scope.acquire();
+        ScopeAcqState acq_state = scope.acquire();
         printf("k=%2d, t=%.3f: ", k, t);
-        printf("Ilow1=%.1f (status=%d)\n", Ilow1, status);
+        printf("Ilow1=%.1f (acq_state=%d)\n", Ilow1, acq_state);
     }
 
     buffer = scope.get_buffer();
