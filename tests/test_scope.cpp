@@ -32,13 +32,13 @@ bool trig_global_fun(void) {
 
 /*Test the Scope data acquisition phase on a test sequence
 */
-bool test_scope_acquire(uint16_t length, float32_t delay,
+bool test_scope_acquire(uint16_t length, uint16_t nb_pretrig,
                         ScopeInput2ch in, ScopeAcqResults out_exp) {
     bool success=true;
     // Init scope
     int nb_channels = 2;
     ScopeMimicry scope(length, nb_channels);
-    scope.set_delay(delay);
+    scope.set_pretrig_nsamples(nb_pretrig);
 
     static float32_t ch1, ch2; // is static needed?
     scope.connectChannel(ch1, "ch1");
@@ -100,7 +100,7 @@ bool test_scope_acquire1() {
     // Scope parameters
     const uint16_t length = 3;
     const int n_channels = 2;
-    float32_t delay = 0.0;
+    uint16_t nb_pretrig = 0;
 
     // Input test sequences
     const int length_seq = 5;
@@ -128,7 +128,7 @@ bool test_scope_acquire1() {
         .memory = memory_exp
     };
 
-    success = test_scope_acquire(length, delay, in, out_exp);
+    success = test_scope_acquire(length, nb_pretrig, in, out_exp);
     return success;
 }
 
@@ -140,7 +140,7 @@ bool test_scope_acquire2() {
     // Scope parameters
     const uint16_t length = 3;
     const int n_channels = 2;
-    float32_t delay = 0.0;
+    uint16_t nb_pretrig = 0;
 
     // Input test sequences
     const int length_seq = 5;
@@ -163,25 +163,25 @@ bool test_scope_acquire2() {
         12, 22, 13, 23, 11, 21,
     };
     ScopeAcqResults out_exp = {
-        .final_idx = 0,
+        .final_idx = 1,
         .status = status_seq,
         .memory = memory_exp
     };
 
-    success = test_scope_acquire(length, delay, in, out_exp);
+    success = test_scope_acquire(length, nb_pretrig, in, out_exp);
     return success;
 }
 
-// Base variant, with trigger at 2nd instant + delay
+// Base variant, with trigger at 2nd instant + nb_pretrig
 // -> expect result be like Base
 bool test_scope_acquire3() {
-    printf("Scope acquisition test 3 (trig k=1, delay=1)...\n");
+    printf("Scope acquisition test 3 (trig k=1, nb_pretrig=1)...\n");
     bool success;
 
     // Scope parameters
     const uint16_t length = 3;
     const int n_channels = 2;
-    float32_t delay = 0.4; // to get int delay=1
+    uint16_t nb_pretrig = 1;
 
     // Input test sequences
     const int length_seq = 5;
@@ -209,19 +209,19 @@ bool test_scope_acquire3() {
         .memory = memory_exp
     };
 
-    success = test_scope_acquire(length, delay, in, out_exp);
+    success = test_scope_acquire(length, nb_pretrig, in, out_exp);
     return success;
 }
 
-// Special bug for delay=100%: scope never stops!
+// Special bug for nb_pretrig=100%: scope never stops!
 bool test_scope_acquire4() {
-    printf("Scope acquisition test 4 (100%% delay)...\n");
+    printf("Scope acquisition test 4 (100%% nb_pretrig)...\n");
     bool success;
 
     // Scope parameters
     const uint16_t length = 3;
     const int n_channels = 2;
-    float32_t delay = 1.0;
+    uint16_t nb_pretrig = length;
 
     // Input test sequences
     const int length_seq = 7;
@@ -241,7 +241,7 @@ bool test_scope_acquire4() {
     // Expected output:
     uint16_t status_seq[length_seq] = {0,0,0, 2,2,2,2};
     float32_t memory_exp[length*n_channels] = {
-        12, 22, 10, 20, 11, 21, // same as test 1 (trig k=0, no delay)
+        12, 22, 10, 20, 11, 21, // same as test 1 (trig k=0, no nb_pretrig)
     };
     ScopeAcqResults out_exp = {
         .final_idx = 0,
@@ -249,7 +249,7 @@ bool test_scope_acquire4() {
         .memory = memory_exp
     };
 
-    success = test_scope_acquire(length, delay, in, out_exp);
+    success = test_scope_acquire(length, nb_pretrig, in, out_exp);
     return success;
 }
 
@@ -261,7 +261,7 @@ bool test_scope_acquire5() {
     // Scope parameters
     const uint16_t length = 3;
     const int n_channels = 2;
-    float32_t delay = 0.0; // to get int delay=1
+    uint16_t nb_pretrig = 0;
 
     // Input test sequences
     const int length_seq = 9;
@@ -290,7 +290,7 @@ bool test_scope_acquire5() {
         .memory = memory_exp
     };
 
-    success = test_scope_acquire(length, delay, in, out_exp);
+    success = test_scope_acquire(length, nb_pretrig, in, out_exp);
     return success;
 }
 
@@ -324,7 +324,7 @@ void scope_demo() {
     scope.connectChannel(Ilow1, "iLow1");
     scope.connectChannel(Ilow2, "iLow2");
     scope.set_trigger(&mytrigger);
-    //scope.set_delay(0.5); // defaults to 0.0
+    //scope.set_pretrig_ratio(0.5); // defaults to 0.0
     //scope.start(); // not needed: automatic after first initialization
 
     for (int k=0; k<length_sim; k++)  {
@@ -356,7 +356,7 @@ void scope_demo() {
 
 int main(void) {
 
-    scope_demo();
+    //scope_demo();
 
     printf("\nScope acquisition tests...\n");
     bool success = true;
