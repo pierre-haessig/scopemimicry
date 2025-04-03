@@ -13,7 +13,8 @@ ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel):
     _acq_count(0),
     _mem_idx(0),
     _trig_idx(0),
-    _final_idx(length-1)
+    _final_idx(length-1),
+    _triggFunc(NULL)
 {
     _memory = new float[_length*_nb_channel]();
     _names = new const char*[nb_channel];
@@ -39,7 +40,13 @@ bool ScopeMimicry::connectChannel(float &channel, const char name[]) {
 }
 
 ScopeAcqState ScopeMimicry::acquire() {
-    bool trigg_value = (*_triggFunc)();
+    // Call trigger function if set, else trigger always true
+    bool trigg_value;
+    if (_triggFunc != NULL) {
+        trigg_value = (*_triggFunc)();
+    } else {
+        trigg_value = true;
+    }
     // Aquisition status state machine, state change logic:
     if (_acq_state == ACQ_UNTRIG) {
         if (trigg_value) {

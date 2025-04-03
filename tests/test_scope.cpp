@@ -293,6 +293,42 @@ bool test_scope_acquire5() {
     return success;
 }
 
+// Forgotten trigger function
+bool test_scope_acquire_notrigger() {
+    printf("Scope acquisition test without trigger function...\n");
+    bool success=true;
+
+    // Scope parameters
+    const uint16_t length = 1;
+    int nb_channels = 2;
+    ScopeMimicry scope(length, nb_channels);
+    static float32_t ch1=10, ch2=20; // is static needed?
+    scope.connectChannel(ch1, "ch1");
+    scope.connectChannel(ch2, "ch2");
+    // missing setting trigger function
+    //scope.set_trigger(&trig_global_fun);
+
+    ScopeAcqState acq_state = scope.acquire();
+
+    // 2. Scope memory content
+    float32_t *memory = (float32_t*) scope.get_buffer();
+    if (acq_state != ACQ_TRIG) {
+        success = false;
+        printf("- Acquisition status mismatch: was %d, expected %d\n",
+               acq_state, ACQ_TRIG);
+    }
+    if (memory[0] != 10. && memory[1] != 20.) {
+        success = false;
+        printf("- Memory content mismatch: is [%g, %g], expected [10.0, 20.0]\n",
+               memory[0], memory[1]);
+    }
+    if (success) {
+        printf("-> SUCCESS\n");
+    } else {
+        printf("-> FAILED\n");
+    }
+    return success;
+}
 
 /*** Scope demo ***/
 
@@ -364,6 +400,7 @@ int main(void) {
     success &= test_scope_acquire3();
     success &= test_scope_acquire4();
     success &= test_scope_acquire5();
+    success &= test_scope_acquire_notrigger();
 
     if (success) {
         printf("GLOBAL SUCCESS\n");
