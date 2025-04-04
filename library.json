@@ -1,6 +1,6 @@
 { 
     "name": "ScopeMimicry",
-    "version": "0.2",
+    "version": "0.2.1",
     "description": "An embedded oscilloscope library to record over time the value of variables in an embedded target for OwnTech applications",
     "keywords": ["OwnTech", "oscilloscope", "record", "datalogger"],
     "authors": [
