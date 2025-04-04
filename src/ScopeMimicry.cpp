@@ -10,7 +10,6 @@
 #include "ScopeMimicry.h"
 #include <stdio.h>
 #include <string.h>
-#include <algorithm>
 
 ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel):
     _length(length),
@@ -62,7 +61,7 @@ ScopeAcqState ScopeMimicry::acquire() {
             // State change: ACQ_UNTRIG -> ACQ_TRIG
             _acq_state = ACQ_TRIG;
             // ACQ_UNTRIG exit actions: keep at most nb_pretrig samples + save trigger instant
-            _acq_count = std::min(_acq_count, _nb_pretrig); // keep at most _nb_pretrig samples before trigger
+            _acq_count = (_acq_count<_nb_pretrig) ? _acq_count : _nb_pretrig; //min(_acq_count, _nb_pretrig), i.e. keep at most _nb_pretrig samples before trigger
             _trig_idx = _mem_idx;
         }
     }
@@ -92,7 +91,7 @@ ScopeAcqState ScopeMimicry::acquire() {
         }
         // Increment memory index and acquisition counter
         _mem_idx = (_mem_idx + 1) % _length;
-        _acq_count = std::min((uint16_t)(_acq_count + (uint16_t)1), _length);
+        _acq_count = (_acq_count+1 < _length) ? _acq_count+1 : _length; //min(_acq_count+1, _length)
     }
     return _acq_state;
 }
