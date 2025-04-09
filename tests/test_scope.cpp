@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <cstring>
 
 #include "ScopeMimicry.h"
 
@@ -330,6 +331,85 @@ bool test_scope_acquire_notrigger() {
     return success;
 }
 
+/***  Scope data dump test 
+ * See https://www.h-schmidt.net/FloatConverter/IEEE754.html on how numbers are stored as float32
+ * 
+ * note: in principle, Intel and ARM processors stores float numbers in Little Endian format
+ * however, the hexademical formatting is done by reading each float32 as an int32
+ * which is formatted as a string with the "%08x" format string.
+ * This write the number in the occidental left to right, which corresponds to Big Endian format!
+ * ***/
+bool test_scope_dump() {
+    bool success=true;
+    printf("Scope data dump test...\n");
+
+    // Setup: a short scope acquisition to fill the memory
+    const uint16_t length = 3;
+    int nb_channels = 2;
+    ScopeMimicry scope(length, nb_channels);
+    static float32_t ch1,ch2; // is static needed?
+    scope.connectChannel(ch1, "ch1");
+    scope.connectChannel(ch2, "ch2");
+    trig_global = true; // always true trigger
+    scope.set_trigger(&trig_global_fun);
+
+    ScopeAcqState acq_state;
+    ch1=10; ch2=20; // 1.25*2^3,  1.25*2^4.   Big Endian hexa: 41200000, 41a00000
+    acq_state = scope.acquire();
+    ch1=11; ch2=21; // 1.375*2^3, 1.3125*2^4. Big Endian hexa: 41300000, 41a80000
+    acq_state = scope.acquire();
+    ch1=12; ch2=22; // 1.5*2^3,   1.375*2^4.  Big Endian hexa: 41400000, 41b00000
+    acq_state = scope.acquire();
+    // After this, scope memory is expected to contain
+    // [10, 20, 11, 21, 12, 22], with final_idx=2
+
+    // Expected data dump:
+    const char* dump_exp = 
+        "#ch1,ch2,\n" //10 chars
+        "## 2\n" // 5 chars
+        "41200000\n" // 9 * 6 chars
+        "41a00000\n"
+        "41300000\n"
+        "41a80000\n"
+        "41400000\n"
+        "41b00000\n";
+    //printf("str len: %d\n", (int)strlen(dump_exp)); len==69
+
+    // Test start: dump scope data
+    char dump[100]; // string to store the dump, which length should be larger than expected dump
+    scope.reset_dump();
+
+    int dump_strlen = 0;
+	while (scope.get_dump_state() != finished) {
+		dump_strlen += sprintf(dump+dump_strlen, "%s", scope.dump_datas());
+	}
+    //printf("%s", dump); // always print data dump
+
+    success &= (strcmp(dump, dump_exp) == 0);
+
+    if (success) {
+        printf("-> SUCCESS\n");
+    } else {
+        printf("Difference in dump data\n");
+        printf("- Expected:\n");
+        printf("%s", dump_exp);
+        printf("- Got instead:\n");
+        printf("%s", dump);
+
+        // find the first character difference
+        int i = 0;
+        while (dump[i] && dump_exp[i] && (dump[i] == dump_exp[i])) {
+            i++;
+        }
+        printf("Difference at character %d ('%c' vs '%c')\n", i+1, dump[i], dump_exp[i]);
+
+        printf("-> FAILED\n");
+    }
+    return success;
+}
+
+
+
 /*** Scope demo ***/
 
 // Static variables the the scope acquisitions will read
@@ -401,6 +481,7 @@ int main(void) {
     success &= test_scope_acquire4();
     success &= test_scope_acquire5();
     success &= test_scope_acquire_notrigger();
+    success &= test_scope_dump();
 
     if (success) {
         printf("GLOBAL SUCCESS\n");
