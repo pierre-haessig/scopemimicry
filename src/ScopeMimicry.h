@@ -216,6 +216,7 @@ private:
 
 	/* Variables for dump_datas method */
 	e_dump_state dump_state;
+	bool _dump_time; // sub state of dump_state=names and dump_state=datas
 	char hash[2] = "#";
 	char nullchar[2] = " ";
 	char char_name[256];

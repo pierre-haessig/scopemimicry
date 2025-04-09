@@ -190,21 +190,29 @@ char* ScopeMimicry::dump_datas() {
 			data_dumped = hash;
 			_idx_name = 0;
 			_idx_datas = 0;
+            _dump_time = true;
 			dump_state = names;
 		break;
 		case names:
-			if (_idx_name < this->get_nb_channel())
-			{
-				strcat(char_name,get_channel_name(_idx_name));
-				strcat(char_name, ",");
-				data_dumped = char_name;
-				_idx_name +=1;
-			}
-			else
-			{
-				data_dumped = (char *) "\n";
-				dump_state = final_idx;
-			}
+            if (_dump_time) {
+                sprintf(char_name, "%s", "time,");
+                _dump_time = false;
+            } else {
+                if (_idx_name < this->get_nb_channel())
+                {
+                    strcat(char_name,get_channel_name(_idx_name));
+                    strcat(char_name, ",");
+                    data_dumped = char_name;
+                    _idx_name +=1;
+                }
+                else
+                {
+                    sprintf(char_name, "%s", "\n");
+                    dump_state = final_idx;
+                    _dump_time = true;
+                }
+            }
+        data_dumped = char_name;
 		break;
 		case final_idx:
 			sprintf(char_name, "## %d\n", get_final_idx());
@@ -212,16 +220,21 @@ char* ScopeMimicry::dump_datas() {
 			dump_state = datas;
 		break;
 		case datas:
-			if (_idx_datas <= n_datas-1)
-			{
-				sprintf(char_data, "%08x\n", *((uint32_t *) _memory + _idx_datas));
-				data_dumped = char_data;
+            if (_dump_time) {
+                float32_t t = _idx_datas/_nb_channel;
+                sprintf(char_data, "%08x\n", *((uint32_t *) &t));
+                _dump_time = false;
+            } else { // dump channel data
+                sprintf(char_data, "%08x\n", *((uint32_t *) _memory + _idx_datas));
+                // next state
+                if ((_idx_datas % _nb_channel) == _nb_channel-1) _dump_time = true;
                 if (_idx_datas < n_datas-1) {
                     _idx_datas += 1;
                 } else { // _idx_datas == n_datas-1
                     dump_state = finished;
                 }
-			}
+            }
+            data_dumped = char_data;
 		break;
 		case finished:
 			data_dumped = nullchar;
