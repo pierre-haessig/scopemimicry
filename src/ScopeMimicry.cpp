@@ -212,15 +212,15 @@ char* ScopeMimicry::dump_datas() {
 			dump_state = datas;
 		break;
 		case datas:
-			if (_idx_datas < n_datas-1)
+			if (_idx_datas <= n_datas-1)
 			{
 				sprintf(char_data, "%08x\n", *((uint32_t *) _memory + _idx_datas));
 				data_dumped = char_data;
-				_idx_datas += 1;
-			}
-			else
-			{
-				dump_state = finished;
+                if (_idx_datas < n_datas-1) {
+                    _idx_datas += 1;
+                } else { // _idx_datas == n_datas-1
+                    dump_state = finished;
+                }
 			}
 		break;
 		case finished:
