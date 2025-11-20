@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Scope: a software oscilloscope library, to record over time the value of variables in embedded applications.
+ * @brief Scope: a software oscilloscope library, to record over time the value of selected variables in embedded applications.
  * 
  * @author Régis Ruelland <regis.ruelland@laas.fr>
  * @author Jean Alinei <jean.alinei@laas.fr>
@@ -176,9 +176,13 @@ public:
 	float get_channel_value(uint32_t index, uint32_t channel_idx);
 	
 	/**
-	 * @brief to call one time before using dump_datas()
+	 * @brief Initialize the scope data dump process.
+	 * 
+	 * init_dump() is automatically called at the end of the data acquition process
+	 * (once acq_state = ACQ_DONE). Thus, calling manually init_dump() is only needed
+	 * if one wants to data dump again after a preceding dump. 
 	 */
-	void reset_dump();
+	void init_dump();
 	
 	/**
 	 * @brief dump_state can be: DUMP_READY, DUMP_NAMES, DUMP_FINAL_IDX, DUMP_DATA, and DUMP_FINISHED.
@@ -188,13 +192,18 @@ public:
 	ScopeDumpState get_dump_state();
 
 	/**
-	 * @brief help to get all the data recorded in a csv format.
-	 * you must call scope.reset_dump() before, then
-	 * it must be called in a while loop until the scope.dump_state == DUMP_FINISHED
+	 * @brief dump a chunk of the recorded data.
+	 * 
+	 * Data is dumped in small chunks of char arrays, to be printed on a serial port.
+	 * To retrieve all recorded data, init_dump() must be called first,
+	 * and then dump() must be called in loop until scope.dump_state == DUMP_FINISHED.
+	 * 
+	 * Dumped data starts with a CSV header of channel names, including time as first column.
+	 * It then continues with the float32 channel values, in their hexadecimal representation.
 	 *
 	 * @return string.
 	 */
-	char *dump_datas();
+	char *dump();
 
 private:
 	const uint16_t _length; // maximum number of sampling instants

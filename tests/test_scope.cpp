@@ -380,12 +380,12 @@ bool test_scope_dump() {
 
     // Test start: dump scope data
     char dump[100]; // string to store the dump, which length should be larger than expected dump
-    scope.reset_dump();
+    scope.init_dump();
 
     int dump_strlen = 0;
     char *data_dumped;
 	while (scope.get_dump_state() != DUMP_FINISHED) {
-        data_dumped = scope.dump_datas();
+        data_dumped = scope.dump();
 		dump_strlen += sprintf(dump+dump_strlen, "%s", data_dumped);
 	}
     //printf("%s", dump); // always print data dump

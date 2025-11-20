@@ -71,6 +71,7 @@ ScopeAcqState Scope::acquire() {
             _acq_state = ACQ_DONE;
             // ACQ_TRIG exit action: save last record index
             _final_idx = (_mem_idx + _length - 1) % _length; // (idx - 1) % _length breaks with unsigned int16 when idx=0
+            init_dump();
         }
 
     }
@@ -174,7 +175,7 @@ float32_t Scope::get_channel_value(uint32_t index, uint32_t channel_idx) {
     return _memory[(index * _nb_channel) + channel_idx];
 }
 
-void Scope::reset_dump() {
+void Scope::init_dump() {
 	dump_state = DUMP_READY;
 }
 
@@ -182,8 +183,7 @@ enum ScopeDumpState Scope::get_dump_state() {
 	return dump_state;
 }
 
-char* Scope::dump_datas() {
-	uint16_t n_datas = _length * _nb_channel;
+char* Scope::dump() {
 	switch (dump_state) {
 		case DUMP_READY:
             // Dump header start
