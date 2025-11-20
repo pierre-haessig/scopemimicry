@@ -184,25 +184,26 @@ enum ScopeDumpState ScopeMimicry::get_dump_state() {
 
 char* ScopeMimicry::dump_datas() {
 	uint16_t n_datas = _length * _nb_channel;
-	/* reset char_name */
-	char_name[0] = '\0';
 	switch (dump_state) {
 		case DUMP_READY:
-			data_dumped = hash_char;
-			_dump_channel_idx = 0;
-            _dump_count = 0;
+            // Dump header start
+            strcpy(char_name, "#");
+			data_dumped = char_name;
             // Next state
             _dump_time = true;
+            _dump_channel_idx = 0;
+            _dump_count = 0;
 			dump_state = DUMP_NAMES;
 		break;
 		case DUMP_NAMES:
-            if (_dump_time) {
-                sprintf(char_name, "%s", "time,");
+            if (_dump_time) { // Dump time to header
+                strcpy(char_name, "time,");
                 _dump_time = false;
-            } else {
+            } else { // Dump each channel name + "," to header
                 if (_dump_channel_idx < this->get_nb_channel())
                 {
-                    strcat(char_name, get_channel_name(_dump_channel_idx));
+                    strncpy(char_name, get_channel_name(_dump_channel_idx), 100);
+                    char_name[100]='\0'; // make sure to null-terminate the string before concatenate
                     strcat(char_name, ",");
                     data_dumped = char_name;
                     // Next sub-state
@@ -210,7 +211,7 @@ char* ScopeMimicry::dump_datas() {
                 }
                 else
                 {
-                    sprintf(char_name, "\n");
+                    strcpy(char_name, "\n");
                     // Next state
                     dump_state = DUMP_FINAL_IDX;
                 }
@@ -254,7 +255,9 @@ char* ScopeMimicry::dump_datas() {
             data_dumped = char_data;
 		break;
 		case DUMP_FINISHED:
-			data_dumped = space_char;
+            // Dump one last line with " "
+			strcpy(char_name, " ");
+            data_dumped = char_name;
 		break;
 		}
 	return data_dumped;

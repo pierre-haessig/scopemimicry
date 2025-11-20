@@ -383,8 +383,10 @@ bool test_scope_dump() {
     scope.reset_dump();
 
     int dump_strlen = 0;
+    char *data_dumped;
 	while (scope.get_dump_state() != DUMP_FINISHED) {
-		dump_strlen += sprintf(dump+dump_strlen, "%s", scope.dump_datas());
+        data_dumped = scope.dump_datas();
+		dump_strlen += sprintf(dump+dump_strlen, "%s", data_dumped);
 	}
     //printf("%s", dump); // always print data dump
 
