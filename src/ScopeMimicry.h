@@ -212,19 +212,18 @@ private:
 	float **_channels;
 	float *_channel_numbers;
 	const char **_names;
-	float *_memory;
+	float *_memory; // Scope memory array, of size length*nb_channels
 
 	/* Variables for dump_datas method */
 	ScopeDumpState dump_state;
 	bool _dump_time; // sub state of DUMP_NAMES and DUMP_DATA
-	char hash[2] = "#";
-	char nullchar[2] = " ";
-	char char_name[256];
-	/* each data is a float written in hexa so eight chars with \n and \0 chars at end */
-	char char_data[10]; // string buffer for hexa reprensentation of 1 float32 value
+	char hash_char[2] = "#";
+	char space_char[2] = " ";
+	char char_name[256]; // string buffer for concatenated channel names
+	char char_data[10]; // string buffer for hexa reprensentation of 1 float32 value = 8 chars + \n and \0
 	char *data_dumped;
-	uint16_t _idx_name;
-	uint16_t _idx_datas;
+	uint16_t _dump_count; // number of samples instants having been dumped
+	uint16_t _dump_channel_idx; // index of current channel being dumped
 };
 
 #endif

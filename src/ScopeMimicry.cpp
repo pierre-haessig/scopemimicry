@@ -75,7 +75,7 @@ ScopeAcqState ScopeMimicry::acquire() {
     }
     // Remark: ACQ_DONE state can only be left by calling start()
 
-    // State machin actions:
+    // State machine actions:
     if (_acq_state == ACQ_DONE) {
         return _acq_state;
 
@@ -187,9 +187,10 @@ char* ScopeMimicry::dump_datas() {
 	char_name[0] = '\0';
 	switch (dump_state) {
 		case DUMP_READY:
-			data_dumped = hash;
-			_idx_name = 0;
-			_idx_datas = 0;
+			data_dumped = hash_char;
+			_dump_channel_idx = 0;
+            _dump_count = 0;
+            // Next state
             _dump_time = true;
 			dump_state = DUMP_NAMES;
 		break;
@@ -198,46 +199,61 @@ char* ScopeMimicry::dump_datas() {
                 sprintf(char_name, "%s", "time,");
                 _dump_time = false;
             } else {
-                if (_idx_name < this->get_nb_channel())
+                if (_dump_channel_idx < this->get_nb_channel())
                 {
-                    strcat(char_name,get_channel_name(_idx_name));
+                    strcat(char_name, get_channel_name(_dump_channel_idx));
                     strcat(char_name, ",");
                     data_dumped = char_name;
-                    _idx_name +=1;
+                    // Next sub-state
+                    _dump_channel_idx +=1;
                 }
                 else
                 {
-                    sprintf(char_name, "%s", "\n");
+                    sprintf(char_name, "\n");
+                    // Next state
                     dump_state = DUMP_FINAL_IDX;
-                    _dump_time = true;
                 }
             }
         data_dumped = char_name;
 		break;
 		case DUMP_FINAL_IDX:
-			sprintf(char_name, "## %d\n", get_final_idx());
+			sprintf(char_name, "## 0\n");
 			data_dumped = char_name;
+            // Next state
 			dump_state = DUMP_DATA;
+            _dump_time = true;
 		break;
 		case DUMP_DATA:
-            if (_dump_time) {
-                float32_t t = _idx_datas/_nb_channel;
-                sprintf(char_data, "%08x\n", *((uint32_t *) &t));
+            if (_dump_time) { // dump time value
+                float32_t time = (_dump_count - _nb_pretrig)*1.0;
+                sprintf(char_data, "%08x\n", *((uint32_t *) &time));
+                // next sub-state: dump data, first channel
                 _dump_time = false;
+                _dump_channel_idx = 0;
             } else { // dump channel data
-                sprintf(char_data, "%08x\n", *((uint32_t *) _memory + _idx_datas));
-                // next state
-                if ((_idx_datas % _nb_channel) == _nb_channel-1) _dump_time = true;
-                if (_idx_datas < n_datas-1) {
-                    _idx_datas += 1;
-                } else { // _idx_datas == n_datas-1
-                    dump_state = DUMP_FINISHED;
+                // Location of data in _memory buffer: first_idx + dump_count
+                uint16_t mem_idx = (_dump_count + get_final_idx() + 1) % _length;
+                int16_t mem_idx_effective = mem_idx * _nb_channel + _dump_channel_idx;
+                sprintf(char_data, "%08x\n", *((uint32_t *) _memory + mem_idx_effective));
+                
+                // Next state or sub-state
+                if (_dump_channel_idx < _nb_channel - 1) {
+                    _dump_channel_idx +=1; // next channel
+                }
+                else {
+                    if (_dump_count < _length - 1) {
+                        _dump_count += 1; // next instant
+                        _dump_time = true; // dump time
+                    }
+                    else {
+                        dump_state = DUMP_FINISHED;
+                    }
                 }
             }
             data_dumped = char_data;
 		break;
 		case DUMP_FINISHED:
-			data_dumped = nullchar;
+			data_dumped = space_char;
 		break;
 		}
 	return data_dumped;

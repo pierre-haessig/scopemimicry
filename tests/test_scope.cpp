@@ -365,18 +365,21 @@ bool test_scope_dump() {
 
     // Expected data dump:
     const char* dump_exp = 
-        "#ch1,ch2,\n" //10 chars
-        "## 2\n" // 5 chars
-        "41200000\n" // 9 * 6 chars
+        "#time,ch1,ch2,\n" //15 chars
+        "## 0\n" // 5 chars, Sum=20
+        "00000000\n" 
+        "41200000\n" 
         "41a00000\n"
+        "3f800000\n"
         "41300000\n"
         "41a80000\n"
+        "40000000\n"
         "41400000\n"
-        "41b00000\n";
-    //printf("str len: %d\n", (int)strlen(dump_exp)); len==69
+        "41b00000\n"; // 9 rows of 9 chars, Sum=101
+    // printf("str len: %d\n", (int)strlen(dump_exp)); //len==101
 
     // Test start: dump scope data
-    char dump[100]; // string to store the dump, which length should be larger than expected dump
+    char dump[101]; // string to store the dump, which length should be larger than expected dump
     scope.reset_dump();
 
     int dump_strlen = 0;
