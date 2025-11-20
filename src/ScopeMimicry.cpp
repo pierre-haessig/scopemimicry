@@ -203,7 +203,9 @@ char* ScopeMimicry::dump_datas() {
                 {
                     strncpy(_dumped_data, get_channel_name(_dump_channel_idx), 100);
                     _dumped_data[100]='\0'; // make sure to null-terminate the string before concatenate
-                    strcat(_dumped_data, ",");
+                    if (_dump_channel_idx < this->get_nb_channel()-1) {
+                        strcat(_dumped_data, ","); // append "," except for last channel
+                    }
                     // Next sub-state
                     _dump_channel_idx +=1;
                 }
