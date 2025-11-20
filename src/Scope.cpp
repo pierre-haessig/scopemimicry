@@ -71,7 +71,6 @@ ScopeAcqState Scope::acquire() {
             _acq_state = ACQ_DONE;
             // ACQ_TRIG exit action: save last record index
             _final_idx = (_mem_idx + _length - 1) % _length; // (idx - 1) % _length breaks with unsigned int16 when idx=0
-            init_dump();
         }
 
     }
@@ -213,15 +212,10 @@ char* Scope::dump() {
                 {
                     strcpy(_dumped_data, "\n");
                     // Next state
-                    dump_state = DUMP_FINAL_IDX;
+                    dump_state = DUMP_DATA;
+                    _dump_time = true;
                 }
             }
-		break;
-		case DUMP_FINAL_IDX:
-			sprintf(_dumped_data, "## %d\n", _length-1); // virtual final_idx, since data is dumped in recording order
-            // Next state
-			dump_state = DUMP_DATA;
-            _dump_time = true;
 		break;
 		case DUMP_DATA:
             if (_dump_time) { // dump time value

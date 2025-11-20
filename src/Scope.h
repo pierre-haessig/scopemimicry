@@ -24,7 +24,6 @@ enum ScopeAcqState {
 enum ScopeDumpState {
 	DUMP_READY,
 	DUMP_NAMES,
-	DUMP_FINAL_IDX,
 	DUMP_DATA,
 	DUMP_FINISHED
 };
@@ -178,14 +177,12 @@ public:
 	/**
 	 * @brief Initialize the scope data dump process.
 	 * 
-	 * init_dump() is automatically called at the end of the data acquition process
-	 * (once acq_state = ACQ_DONE). Thus, calling manually init_dump() is only needed
-	 * if one wants to data dump again after a preceding dump. 
+	 * Must be called before the first dump() call, or start a new dump process.
 	 */
 	void init_dump();
 	
 	/**
-	 * @brief dump_state can be: DUMP_READY, DUMP_NAMES, DUMP_FINAL_IDX, DUMP_DATA, and DUMP_FINISHED.
+	 * @brief dump_state can be: DUMP_READY, DUMP_NAMES, DUMP_DATA, and DUMP_FINISHED.
 	 *
 	 * @return current dump_state value
 	 */
