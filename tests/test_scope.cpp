@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <cstring>
 
-#include "ScopeMimicry.h"
+#include "Scope.h"
 
 /* Scope acquisition test input data*/
 struct ScopeInput2ch {

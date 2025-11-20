@@ -8,15 +8,15 @@ set(BUILD_TYPE debug)
 set(CMAKE_CXX_FLAGS "-std=c++2a -ggdb")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_library(Scope ../src/ScopeMimicry.cpp)
+add_library(Scope ../src/Scope.cpp)
 target_include_directories(Scope PRIVATE ../src)
 set(SRCS
     test_scope.cpp
-    ../src/ScopeMimicry.cpp
+    ../src/Scope.cpp
     )
 
 set(HEADERS
-    ../src/ScopeMimicry.h
+    ../src/Scope.h
     )
 # On indique que l'on veut un exécutable "test_scope" compilé à partir des fichiers décrits par les variables SRCS et HEADERS
 # add_executable(test_scope ${SRCS} ${HEADERS})

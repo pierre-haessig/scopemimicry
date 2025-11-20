@@ -1,13 +1,13 @@
 /**
  * @file
- * @brief ScopeMimicry: mimic a digital scope inside the cpu with a ram array.
+ * @brief Scope: multi-channel digital oscilloscope to be embedded in a microcontroller application.
  * 
  * @author Régis Ruelland <regis.ruelland@laas.fr>
  * @author Jean Alinei <jean.alinei@laas.fr>
  * @author Pierre Haessig <pierre.haessig@centralesupelec.fr>
  */
 
-#include "ScopeMimicry.h"
+#include "Scope.h"
 #include <stdio.h>
 #include <string.h>
 

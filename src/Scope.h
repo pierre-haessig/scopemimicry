@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief ScopeMimicry: mimic a digital scope inside the cpu with a ram array.
+ * @brief Scope: multi-channel digital oscilloscope to be embedded in a microcontroller application.
  * 
  * @author Régis Ruelland <regis.ruelland@laas.fr>
  * @author Jean Alinei <jean.alinei@laas.fr>
