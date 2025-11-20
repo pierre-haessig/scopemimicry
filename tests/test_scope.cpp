@@ -366,7 +366,7 @@ bool test_scope_dump() {
     // Expected data dump:
     const char* dump_exp = 
         "#time,ch1,ch2,\n" //15 chars
-        "## 0\n" // 5 chars, Sum=20
+        "## 2\n" // 5 chars, Sum=20
         "00000000\n" 
         "41200000\n" 
         "41a00000\n"

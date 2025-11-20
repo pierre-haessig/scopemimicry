@@ -217,7 +217,7 @@ char* ScopeMimicry::dump_datas() {
         data_dumped = char_name;
 		break;
 		case DUMP_FINAL_IDX:
-			sprintf(char_name, "## 0\n");
+			sprintf(char_name, "## %d\n", _length-1); // virtual final_idx, since data is dumped in recording order
 			data_dumped = char_name;
             // Next state
 			dump_state = DUMP_DATA;
