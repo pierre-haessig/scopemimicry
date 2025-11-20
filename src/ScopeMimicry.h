@@ -219,9 +219,10 @@ private:
 	/* Variables for dump_datas method */
 	ScopeDumpState dump_state;
 	bool _dump_time; // sub state of DUMP_NAMES and DUMP_DATA
-	char char_name[102]; // string buffer one channel name + ","
-	char char_data[10]; // string buffer for hexadecimal representation of 1 float32 value (8 chars) + '\n' + '\0' = 10 chars
-	char *data_dumped;
+	char _dumped_data[102]; // string buffer for dumped data
+	// buffer should hold either:
+	// - channel name (up to 100 chars) + ',' + '\0' = 102 chars
+	// - hexadecimal representation of 1 float32 value (8 chars) + '\n' + '\0' = 10 chars
 	uint16_t _dump_count; // number of samples instants having been dumped
 	uint16_t _dump_channel_idx; // index of current channel being dumped
 };

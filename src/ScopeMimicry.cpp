@@ -187,8 +187,7 @@ char* ScopeMimicry::dump_datas() {
 	switch (dump_state) {
 		case DUMP_READY:
             // Dump header start
-            strcpy(char_name, "#");
-			data_dumped = char_name;
+            strcpy(_dumped_data, "#");
             // Next state
             _dump_time = true;
             _dump_channel_idx = 0;
@@ -197,30 +196,27 @@ char* ScopeMimicry::dump_datas() {
 		break;
 		case DUMP_NAMES:
             if (_dump_time) { // Dump time to header
-                strcpy(char_name, "time,");
+                strcpy(_dumped_data, "time,");
                 _dump_time = false;
             } else { // Dump each channel name + "," to header
                 if (_dump_channel_idx < this->get_nb_channel())
                 {
-                    strncpy(char_name, get_channel_name(_dump_channel_idx), 100);
-                    char_name[100]='\0'; // make sure to null-terminate the string before concatenate
-                    strcat(char_name, ",");
-                    data_dumped = char_name;
+                    strncpy(_dumped_data, get_channel_name(_dump_channel_idx), 100);
+                    _dumped_data[100]='\0'; // make sure to null-terminate the string before concatenate
+                    strcat(_dumped_data, ",");
                     // Next sub-state
                     _dump_channel_idx +=1;
                 }
                 else
                 {
-                    strcpy(char_name, "\n");
+                    strcpy(_dumped_data, "\n");
                     // Next state
                     dump_state = DUMP_FINAL_IDX;
                 }
             }
-        data_dumped = char_name;
 		break;
 		case DUMP_FINAL_IDX:
-			sprintf(char_name, "## %d\n", _length-1); // virtual final_idx, since data is dumped in recording order
-			data_dumped = char_name;
+			sprintf(_dumped_data, "## %d\n", _length-1); // virtual final_idx, since data is dumped in recording order
             // Next state
 			dump_state = DUMP_DATA;
             _dump_time = true;
@@ -228,7 +224,7 @@ char* ScopeMimicry::dump_datas() {
 		case DUMP_DATA:
             if (_dump_time) { // dump time value
                 float32_t time = (_dump_count - _nb_pretrig) * _Ts;
-                sprintf(char_data, "%08x\n", *((uint32_t *) &time));
+                sprintf(_dumped_data, "%08x\n", *((uint32_t *) &time));
                 // next sub-state: dump data, first channel
                 _dump_time = false;
                 _dump_channel_idx = 0;
@@ -236,7 +232,7 @@ char* ScopeMimicry::dump_datas() {
                 // Location of data in _memory buffer: first_idx + dump_count
                 uint16_t mem_idx = (_dump_count + get_final_idx() + 1) % _length;
                 int16_t mem_idx_effective = mem_idx * _nb_channel + _dump_channel_idx;
-                sprintf(char_data, "%08x\n", *((uint32_t *) _memory + mem_idx_effective));
+                sprintf(_dumped_data, "%08x\n", *((uint32_t *) _memory + mem_idx_effective));
                 
                 // Next state or sub-state
                 if (_dump_channel_idx < _nb_channel - 1) {
@@ -252,13 +248,11 @@ char* ScopeMimicry::dump_datas() {
                     }
                 }
             }
-            data_dumped = char_data;
 		break;
 		case DUMP_FINISHED:
             // Dump one last line with " "
-			strcpy(char_name, " ");
-            data_dumped = char_name;
+			strcpy(_dumped_data, " ");
 		break;
 		}
-	return data_dumped;
+	return _dumped_data;
 }
