@@ -36,8 +36,9 @@ public:
 	 *
 	 * @param length number of samples to record, for each variable
 	 * @param nb_channel number of variables to record
+	 * @param Ts sampling time period
 	 */
-	ScopeMimicry(uint16_t length, uint16_t nb_channel);
+	ScopeMimicry(uint16_t length, uint16_t nb_channel, float Ts);
 	
 	/**
 	 * @brief destry scope instance and release RAM
@@ -195,8 +196,9 @@ public:
 	char *dump_datas();
 
 private:
-	const uint16_t _length;
-	const uint16_t _nb_channel;
+	const uint16_t _length; // maximum number of sampling instants
+	const uint16_t _nb_channel; // maximum number of channels
+	const float _Ts; // sampling time period
 	uint16_t _nb_channel_effective;
 
 	/* Variables for acquisition logic */

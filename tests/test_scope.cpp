@@ -38,7 +38,7 @@ bool test_scope_acquire(uint16_t length, uint16_t nb_pretrig,
     bool success=true;
     // Init scope
     int nb_channels = 2;
-    ScopeMimicry scope(length, nb_channels);
+    ScopeMimicry scope(length, nb_channels, 1.0);
     scope.set_pretrig_nsamples(nb_pretrig);
 
     static float32_t ch1, ch2; // is static needed?
@@ -302,7 +302,7 @@ bool test_scope_acquire_notrigger() {
     // Scope parameters
     const uint16_t length = 1;
     int nb_channels = 2;
-    ScopeMimicry scope(length, nb_channels);
+    ScopeMimicry scope(length, nb_channels, 1.0);
     static float32_t ch1=10, ch2=20; // is static needed?
     scope.connectChannel(ch1, "ch1");
     scope.connectChannel(ch2, "ch2");
@@ -346,7 +346,7 @@ bool test_scope_dump() {
     // Setup: a short scope acquisition to fill the memory
     const uint16_t length = 3;
     int nb_channels = 2;
-    ScopeMimicry scope(length, nb_channels);
+    ScopeMimicry scope(length, nb_channels, 1.0);
     static float32_t ch1,ch2; // is static needed?
     scope.connectChannel(ch1, "ch1");
     scope.connectChannel(ch2, "ch2");
@@ -437,7 +437,7 @@ void scope_demo() {
     int length_sim = 40; // simulation length -> 40 ms
     uint16_t length = 10; // scope capture length
     const int n_channels = 2;
-    ScopeMimicry scope(length, n_channels);
+    ScopeMimicry scope(length, n_channels, 1.0);
 
     scope.connectChannel(Ilow1, "iLow1");
     scope.connectChannel(Ilow2, "iLow2");

@@ -11,9 +11,10 @@
 #include <stdio.h>
 #include <string.h>
 
-ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel):
+ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel, float Ts):
     _length(length),
     _nb_channel(nb_channel),
+    _Ts(Ts),
     _nb_channel_effective(0),
     /* Variables for acquisition logic */
     _nb_pretrig(0),
@@ -225,7 +226,7 @@ char* ScopeMimicry::dump_datas() {
 		break;
 		case DUMP_DATA:
             if (_dump_time) { // dump time value
-                float32_t time = (_dump_count - _nb_pretrig)*1.0;
+                float32_t time = (_dump_count - _nb_pretrig) * _Ts;
                 sprintf(char_data, "%08x\n", *((uint32_t *) &time));
                 // next sub-state: dump data, first channel
                 _dump_time = false;
