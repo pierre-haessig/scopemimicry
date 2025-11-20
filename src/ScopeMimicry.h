@@ -14,12 +14,12 @@
 typedef float float32_t;
 
 /* Scope data dump state*/
-enum e_dump_state {
-	initialized,
-	names,
-	final_idx,
-	datas,
-	finished
+enum ScopeDumpState {
+	DUMP_READY,
+	DUMP_NAMES,
+	DUMP_FINAL_IDX,
+	DUMP_DATA,
+	DUMP_FINISHED
 };
 
 /*Scope acquisition state*/
@@ -179,16 +179,16 @@ public:
 	void reset_dump();
 	
 	/**
-	 * @brief dump_state can be: initialized, names, final_idx, datas, and finished.
+	 * @brief dump_state can be: DUMP_READY, DUMP_NAMES, DUMP_FINAL_IDX, DUMP_DATA, and DUMP_FINISHED.
 	 *
 	 * @return current dump_state value
 	 */
-	e_dump_state get_dump_state();
+	ScopeDumpState get_dump_state();
 
 	/**
 	 * @brief help to get all the data recorded in a csv format.
 	 * you must call scope.reset_dump() before, then
-	 * it must be called in a while loop until the scope.dump_state == finished
+	 * it must be called in a while loop until the scope.dump_state == DUMP_FINISHED
 	 *
 	 * @return string.
 	 */
@@ -215,8 +215,8 @@ private:
 	float *_memory;
 
 	/* Variables for dump_datas method */
-	e_dump_state dump_state;
-	bool _dump_time; // sub state of dump_state=names and dump_state=datas
+	ScopeDumpState dump_state;
+	bool _dump_time; // sub state of DUMP_NAMES and DUMP_DATA
 	char hash[2] = "#";
 	char nullchar[2] = " ";
 	char char_name[256];

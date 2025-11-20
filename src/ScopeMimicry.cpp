@@ -174,10 +174,10 @@ float32_t ScopeMimicry::get_channel_value(uint32_t index, uint32_t channel_idx) 
 }
 
 void ScopeMimicry::reset_dump() {
-	dump_state = initialized;
+	dump_state = DUMP_READY;
 }
 
-enum e_dump_state ScopeMimicry::get_dump_state() {
+enum ScopeDumpState ScopeMimicry::get_dump_state() {
 	return dump_state;
 }
 
@@ -186,14 +186,14 @@ char* ScopeMimicry::dump_datas() {
 	/* reset char_name */
 	char_name[0] = '\0';
 	switch (dump_state) {
-		case initialized:
+		case DUMP_READY:
 			data_dumped = hash;
 			_idx_name = 0;
 			_idx_datas = 0;
             _dump_time = true;
-			dump_state = names;
+			dump_state = DUMP_NAMES;
 		break;
-		case names:
+		case DUMP_NAMES:
             if (_dump_time) {
                 sprintf(char_name, "%s", "time,");
                 _dump_time = false;
@@ -208,18 +208,18 @@ char* ScopeMimicry::dump_datas() {
                 else
                 {
                     sprintf(char_name, "%s", "\n");
-                    dump_state = final_idx;
+                    dump_state = DUMP_FINAL_IDX;
                     _dump_time = true;
                 }
             }
         data_dumped = char_name;
 		break;
-		case final_idx:
+		case DUMP_FINAL_IDX:
 			sprintf(char_name, "## %d\n", get_final_idx());
 			data_dumped = char_name;
-			dump_state = datas;
+			dump_state = DUMP_DATA;
 		break;
-		case datas:
+		case DUMP_DATA:
             if (_dump_time) {
                 float32_t t = _idx_datas/_nb_channel;
                 sprintf(char_data, "%08x\n", *((uint32_t *) &t));
@@ -231,12 +231,12 @@ char* ScopeMimicry::dump_datas() {
                 if (_idx_datas < n_datas-1) {
                     _idx_datas += 1;
                 } else { // _idx_datas == n_datas-1
-                    dump_state = finished;
+                    dump_state = DUMP_FINISHED;
                 }
             }
             data_dumped = char_data;
 		break;
-		case finished:
+		case DUMP_FINISHED:
 			data_dumped = nullchar;
 		break;
 		}
