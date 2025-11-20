@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel, float Ts):
+Scope::Scope(uint16_t length, uint16_t nb_channel, float Ts):
     _length(length),
     _nb_channel(nb_channel),
     _Ts(Ts),
@@ -30,13 +30,13 @@ ScopeMimicry::ScopeMimicry(uint16_t length, uint16_t nb_channel, float Ts):
     _channels = new float32_t *[nb_channel];
 };
 
-ScopeMimicry::~ScopeMimicry() {
+Scope::~Scope() {
     delete(_memory);
     delete(_names);
     // missing delete _channels?
 }
 
-bool ScopeMimicry::connectChannel(float &channel, const char name[]) {
+bool Scope::connectChannel(float &channel, const char name[]) {
     if (_nb_channel_effective < _nb_channel) {
         // capture the reference of the variable.
         _channels[_nb_channel_effective] = &channel;
@@ -48,7 +48,7 @@ bool ScopeMimicry::connectChannel(float &channel, const char name[]) {
     }
 }
 
-ScopeAcqState ScopeMimicry::acquire() {
+ScopeAcqState Scope::acquire() {
     // Call trigger function if set, else trigger always true
     bool trigg_value;
     if (_triggFunc != NULL) {
@@ -97,69 +97,69 @@ ScopeAcqState ScopeMimicry::acquire() {
     return _acq_state;
 }
 
-uint16_t ScopeMimicry::get_pretrig_nsamples() {
+uint16_t Scope::get_pretrig_nsamples() {
     return _nb_pretrig;
 }
 
-void ScopeMimicry::set_pretrig_nsamples(uint16_t n) {
+void Scope::set_pretrig_nsamples(uint16_t n) {
     if (n < 0) _nb_pretrig = 0;
     else if (n > _length) _nb_pretrig = _length;
     else _nb_pretrig = n;
 }
 
-void ScopeMimicry::set_pretrig_ratio(float r) {
+void Scope::set_pretrig_ratio(float r) {
     if (r < 0.0) _nb_pretrig = 0;
     else if (r >= 1.0) _nb_pretrig = _length;
     else _nb_pretrig = r *_length;
 }
 
-void ScopeMimicry::start() {
+void Scope::start() {
     _acq_state = ACQ_UNTRIG;
     _acq_count = 0;
     _mem_idx = 0;
 }
 
-void ScopeMimicry::set_trigger(bool (*func)()) {
+void Scope::set_trigger(bool (*func)()) {
     _triggFunc = func;
 }
 
-bool ScopeMimicry::has_trigged() {
+bool Scope::has_trigged() {
     return _acq_state == ACQ_TRIG || _acq_state == ACQ_DONE;
 }
 
-ScopeAcqState ScopeMimicry::acq_state() {
+ScopeAcqState Scope::acq_state() {
     return _acq_state;
 }
 
-uint16_t ScopeMimicry::get_final_idx() {
+uint16_t Scope::get_final_idx() {
     return _final_idx;
 }
 
-uint16_t ScopeMimicry::get_trig_idx() {
+uint16_t Scope::get_trig_idx() {
     return _trig_idx;
 }
 
-uint8_t * ScopeMimicry::get_buffer() {
+uint8_t * Scope::get_buffer() {
     return (uint8_t * )_memory;
 }
 
-uint16_t ScopeMimicry::get_buffer_size() {
+uint16_t Scope::get_buffer_size() {
     return (_length * _nb_channel * sizeof(float32_t));
 }
 
-uint16_t ScopeMimicry::get_length() {
+uint16_t Scope::get_length() {
     return _length;
 }
 
-uint16_t ScopeMimicry::get_nb_channel() {
+uint16_t Scope::get_nb_channel() {
     return _nb_channel;
 }
 
-uint16_t ScopeMimicry::get_nb_channel_effective() {
+uint16_t Scope::get_nb_channel_effective() {
     return _nb_channel_effective;
 }
 
-const char *ScopeMimicry::get_channel_name(uint16_t idx) {
+const char *Scope::get_channel_name(uint16_t idx) {
     if (idx < _nb_channel) {
         return this->_names[idx];
     }
@@ -168,21 +168,21 @@ const char *ScopeMimicry::get_channel_name(uint16_t idx) {
     }
 }
 
-float32_t ScopeMimicry::get_channel_value(uint32_t index, uint32_t channel_idx) {
+float32_t Scope::get_channel_value(uint32_t index, uint32_t channel_idx) {
     /* to be sure we are not outside the buffer */
     index = (index) % _length;
     return _memory[(index * _nb_channel) + channel_idx];
 }
 
-void ScopeMimicry::reset_dump() {
+void Scope::reset_dump() {
 	dump_state = DUMP_READY;
 }
 
-enum ScopeDumpState ScopeMimicry::get_dump_state() {
+enum ScopeDumpState Scope::get_dump_state() {
 	return dump_state;
 }
 
-char* ScopeMimicry::dump_datas() {
+char* Scope::dump_datas() {
 	uint16_t n_datas = _length * _nb_channel;
 	switch (dump_state) {
 		case DUMP_READY:

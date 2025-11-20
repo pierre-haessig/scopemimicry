@@ -29,7 +29,7 @@ enum ScopeAcqState {
 	ACQ_DONE    // data recording finished
 };
 
-class ScopeMimicry {
+class Scope {
 public:
 	/**
 	 * @brief create a scope with RAM storage for recorded data
@@ -38,12 +38,12 @@ public:
 	 * @param nb_channel number of variables to record
 	 * @param Ts sampling time period
 	 */
-	ScopeMimicry(uint16_t length, uint16_t nb_channel, float Ts);
+	Scope(uint16_t length, uint16_t nb_channel, float Ts);
 	
 	/**
 	 * @brief destry scope instance and release RAM
 	 */
-	~ScopeMimicry();
+	~Scope();
 	
 	/**
 	 * @brief store a reference to static variable (channel), associated to a channel name
