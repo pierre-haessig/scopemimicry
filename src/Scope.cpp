@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Scope: multi-channel digital oscilloscope to be embedded in a microcontroller application.
+ * @brief Scope: a software oscilloscope library, to record over time the value of selected variables in embedded applications.
  * 
  * @author Régis Ruelland <regis.ruelland@laas.fr>
  * @author Jean Alinei <jean.alinei@laas.fr>

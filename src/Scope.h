@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Scope: multi-channel digital oscilloscope to be embedded in a microcontroller application.
+ * @brief Scope: a software oscilloscope library, to record over time the value of variables in embedded applications.
  * 
  * @author Régis Ruelland <regis.ruelland@laas.fr>
  * @author Jean Alinei <jean.alinei@laas.fr>
@@ -13,6 +13,13 @@
 #include <cstdint>
 typedef float float32_t;
 
+/*Scope acquisition state*/
+enum ScopeAcqState {
+	ACQ_UNTRIG, // data being recorded, before trigger
+	ACQ_TRIG,   // data being recorded, after trigger
+	ACQ_DONE    // data recording finished
+};
+
 /* Scope data dump state*/
 enum ScopeDumpState {
 	DUMP_READY,
@@ -22,12 +29,6 @@ enum ScopeDumpState {
 	DUMP_FINISHED
 };
 
-/*Scope acquisition state*/
-enum ScopeAcqState {
-	ACQ_UNTRIG, // data being recorded, before trigger
-	ACQ_TRIG,   // data being recorded, after trigger
-	ACQ_DONE    // data recording finished
-};
 
 class Scope {
 public:
@@ -36,7 +37,7 @@ public:
 	 *
 	 * @param length number of samples to record, for each variable
 	 * @param nb_channel number of variables to record
-	 * @param Ts sampling time period
+	 * @param Ts sampling time period, for time vector computation
 	 */
 	Scope(uint16_t length, uint16_t nb_channel, float Ts);
 	
