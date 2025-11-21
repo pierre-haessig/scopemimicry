@@ -34,7 +34,7 @@ public:
 	/**
 	 * @brief create a scope with RAM storage for recorded data
 	 *
-	 * @param length number of samples to record, for each variable
+	 * @param length number of time samples to record
 	 * @param nb_channel number of variables to record
 	 * @param Ts sampling time period, for time vector computation
 	 */
@@ -61,8 +61,10 @@ public:
 	/**
 	 * @brief store one value of each channel into internal memory if scope is recording
 	 * 
-	 * @details 
-	 * data recording happens after scope start in two cases:
+	 * The acquire() method should be called every Ts instants,
+	 * typically from a critical task of the application.
+	 *
+	 * Data recording happens after scope start in two cases:
 	 * - before trigger, to allow recording nb_pretrig instants
 	 * - after trigger, as long as less than (length) sample have been recorded
 	 *

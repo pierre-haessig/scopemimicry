@@ -18,7 +18,7 @@ Add the following to `lib_deps` in `platformio.ini`
 In the microcontroller application code:
 
 ```cpp
-#include "ScopeMimicry.h"
+#include "Scope.h"
 ```
 
 ## Scope library usage
@@ -26,45 +26,81 @@ In the microcontroller application code:
 ### 1\. Scope setup
 
 Within the microcontroller application setup rountine, create your scope object:
-
 ```cpp
-ScopeMimicry scope(sample_lenght, number_of_channels);
+Scope scope(length, nb_channel, Ts);
 ```
 
-- Sample length is the number of data points per channel.  
-- Number of channel is the total number of channels acquired by the scope.
-  
+with the following parameters:
+
+* `length`:  number of time samples to record
+* `nb_channel`:  number of variables to record
+* `Ts`:  sampling time period, which is used for time vector computation
+
+Memory requirement: to store recorded values, the Scope instance allocates a memory buffer
+of size `length` × `nb_channel` × 4B (4 Byte per float32 value).
 
 For example:
 ```cpp
-ScopeMimicry scope(512, 4);
+Scope scope(512, 4);
 ```
-Defines a scope with 4 channels and 512 data points per channel.
+
+defines a scope with 4 channels and 512 data points per channel.
+This requires 4×512×4B = 8 kB of RAM memory.
 
 #### Channels connection
 
 Channels are connected to variables using:
 
 ```cpp
-scope.connectChannel(variable, "channel_name");
+scope.connectChannel(myvar, "channel_name");
 ```
-with `variable` being a `static` `float` variable. For example:
+
+with `myvar` being a `static` `float` variable. For example:
+
 ```cpp
 scope.connectChannel(I1_low_value, "I1_low");
 ```
+
 Remarks:
 
 - Because `connectChannel` stores a reference to the variable, make sure that the variable to be recorded is a persistent `static` variable
 - Make sure to connect as many channels as the number of channels set up in scope object, otherwise `NaN` values are recorded for missing channels.
 
 ### 2\. Data acquisition and trigger
-Data acquisition is done by **repeatedly** calling:  
+
+The record of channel samples is not automatic. Rather, it must be done by **periodically** calling:  
 
 ```cpp
 scope.acquire();
 ```
 
-This is typically done at a periodic rate within the application **control loop** and it captures one sample value for each channel variable.
+which captures one sample value for each channel variable.
+
+`acquire()` is typically called periodically within the application **control loop** (a critical task).
+The periodicity should match the `Ts` parameter of the Scope initialization for the time vector to be consistent.
+
+#### Data rate decimation (downsampling)
+
+It may be the case the desired scope sampling rate is less than the control task frequency.
+In that case, it is possible to downsample (with an integer factor: 2, 3, ...) the recording with the following construct:
+
+```cpp
+static const float32_t Ts = 100e-6F; // control task period
+const static uint32_t scope_decimation = 2; 
+static uint32_t counter_time = 0;
+
+Scope scope(length, nb_channel, Ts*scope_decimation);
+
+void control_task() {
+    counter_time++;
+    // [Rest of the control task...]
+	if (counter_time % scope_decimation == 0) {
+		scope.acquire();
+	}
+```
+
+Notice that downsampling may create [aliasing](https://en.wikipedia.org/wiki/Aliasing) artifacts, in particular in the presence of high frequencies.
+If needed, signals should be lowpass filtered before decimation (as done in [scipy.signal.decimate](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.decimate.html) for example).
 
 #### Setting Trigger
 
@@ -131,13 +167,31 @@ This is not needed the first time after scope initialization (start is automatic
 
 ### 3\. Scope data retrieval
 
-Once data acquisition is finished (preferably), the content of the scope memory can be retrieved and sent over the serial link to the host computer by repeatedly calling `scope.dump_datas()` (outside the critical control task, yielding execution between each call):
+Once data acquisition is finished (preferably), the content of the scope memory can be retrieved and sent over the serial link to the host computer by repeatedly calling `scope.dump()`.
+These calls should be *outside* the critical control task, yielding execution between each call.
+They return data chunks of char array which can be directly printed to a serial link:
 
 ```C++
-scope.reset_dump();
-while (scope.get_dump_state() != finished) {
-    printk("%s", scope.dump_datas());
+scope.init_dump(); // Init the data dump process
+while (scope.get_dump_state() != DUMP_FINISHED) {
+    printk("%s", scope.dump());
     task.suspendBackgroundUs(200);
 }
 ```
 
+#### Scope dump content
+
+- first line: CSV file header with signal names, including time as first channel
+- next lines: value of one channel at one instant, in the order of the channels (time first), and in chronological order. The float32 values are transformed as a string of their hexadecimal representation (8 chars)
+
+Example of the first four chunks of a scope with two channels ch1 and ch2, with Ts=1.0, with no pre trigger:
+```C++
+"#time,ch1,ch2\n"
+"00000000\n" // 1st sample: time = 0.0
+"41200000\n" // 1st sample: ch1 = 10.0F
+"41a00000\n" // 1st sample: ch2 = 20.0F
+"3f800000\n" // 2nd sample: time = 1.0
+...
+```
+
+the time vector is computed using the `Ts` (sampling period) parameter, with time=0 corresponding to the trigger instant.
