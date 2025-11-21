@@ -86,17 +86,18 @@ In that case, it is possible to downsample (with an integer factor: 2, 3, ...) t
 
 ```cpp
 static const float32_t Ts = 100e-6F; // control task period
-const static uint32_t scope_decimation = 2; 
+const static uint32_t scope_decimation = 2;
 static uint32_t counter_time = 0;
 
 Scope scope(length, nb_channel, Ts*scope_decimation);
 
 void control_task() {
     counter_time++;
-    // [Rest of the control task...]
+    // [Other control task computations: measurements, feedback...]
 	if (counter_time % scope_decimation == 0) {
 		scope.acquire();
 	}
+}
 ```
 
 Notice that downsampling may create [aliasing](https://en.wikipedia.org/wiki/Aliasing) artifacts, in particular in the presence of high frequencies.
