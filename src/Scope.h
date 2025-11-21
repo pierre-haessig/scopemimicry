@@ -7,8 +7,8 @@
  * @author Pierre Haessig <pierre.haessig@centralesupelec.fr>
  */
 
-#ifndef _SCOPEMIMICRY_H_
-#define _SCOPEMIMICRY_H_
+#ifndef _SCOPE_H_
+#define _SCOPE_H_
 
 #include <cstdint>
 typedef float float32_t;
