@@ -331,7 +331,48 @@ bool test_scope_acquire_notrigger() {
     return success;
 }
 
-/***  Scope data dump test 
+/*** Compare the dump content of a Scope (after record) to an expected dump
+ * 
+ * The dump string should be large enough to hold the entire concatenated scope dump.
+ */
+bool compare_scope_dump(Scope* scope, char* dump, const char* dump_exp) {
+    bool success=true;
+
+    scope->init_dump();
+
+    // Read scope dump
+    int dump_strlen = 0;
+    char *data_dumped;
+	while (scope->get_dump_state() != DUMP_FINISHED) {
+        data_dumped = scope->dump();
+		dump_strlen += sprintf(dump+dump_strlen, "%s", data_dumped);
+	}
+    //printf("%s", dump); // always print data dump
+
+    success &= (strcmp(dump, dump_exp) == 0);
+
+    if (success) {
+        printf("-> SUCCESS\n");
+    } else {
+        printf("Difference in dump data\n");
+        printf("- Expected:\n");
+        printf("%s", dump_exp);
+        printf("- Got instead:\n");
+        printf("%s", dump);
+
+        // find the first character difference
+        int i = 0;
+        while (dump[i] && dump_exp[i] && (dump[i] == dump_exp[i])) {
+            i++;
+        }
+        printf("Difference at character %d ('%c' vs '%c')\n", i+1, dump[i], dump_exp[i]);
+
+        printf("-> FAILED\n");
+    }
+    return success;
+}
+
+/***  Scope data dump test. Simplest case (immediate trigger, no pretrig).
  * See https://www.h-schmidt.net/FloatConverter/IEEE754.html on how numbers are stored as float32
  * 
  * note: in principle, Intel and ARM processors stores float numbers in Little Endian format
@@ -377,41 +418,62 @@ bool test_scope_dump() {
         "41b00000\n"; // 9 rows of 9 chars = 81, Sum=95
     // printf("str len: %d\n", (int)strlen(dump_exp)); //len==95
 
-    // Test start: dump scope data
     char dump[95]; // string to store the dump, which length should be larger than expected dump
-    scope.init_dump();
 
-    int dump_strlen = 0;
-    char *data_dumped;
-	while (scope.get_dump_state() != DUMP_FINISHED) {
-        data_dumped = scope.dump();
-		dump_strlen += sprintf(dump+dump_strlen, "%s", data_dumped);
-	}
-    //printf("%s", dump); // always print data dump
-
-    success &= (strcmp(dump, dump_exp) == 0);
-
-    if (success) {
-        printf("-> SUCCESS\n");
-    } else {
-        printf("Difference in dump data\n");
-        printf("- Expected:\n");
-        printf("%s", dump_exp);
-        printf("- Got instead:\n");
-        printf("%s", dump);
-
-        // find the first character difference
-        int i = 0;
-        while (dump[i] && dump_exp[i] && (dump[i] == dump_exp[i])) {
-            i++;
-        }
-        printf("Difference at character %d ('%c' vs '%c')\n", i+1, dump[i], dump_exp[i]);
-
-        printf("-> FAILED\n");
-    }
+    success &= compare_scope_dump(&scope, dump, dump_exp);
+    
     return success;
 }
 
+/***  Scope data dump test, with delayed trigger
+ * 
+ * This test the case where final_idx != length-1 (i.e. end of buffer)
+ * ***/
+bool test_scope_dump_delay_trig() {
+    bool success=true;
+    printf("Scope data dump test, with delay and trigger...\n");
+
+    // Setup: a short scope acquisition to fill the memory
+    const uint16_t length = 2;
+    int nb_channels = 2;
+    Scope scope(length, nb_channels, 1.0);
+    static float32_t ch1,ch2; // is static needed?
+    scope.connectChannel(ch1, "ch1");
+    scope.connectChannel(ch2, "ch2");
+
+    trig_global = false; // initially false trigger
+    scope.set_trigger(&trig_global_fun);
+
+    ScopeAcqState acq_state;
+    ch1=10; ch2=20; // 1.25*2^3,  1.25*2^4.   Big Endian hexa: 41200000, 41a00000
+    acq_state = scope.acquire();
+
+    trig_global = true; // trigger gets true
+    ch1=11; ch2=21; // 1.375*2^3, 1.3125*2^4. Big Endian hexa: 41300000, 41a80000
+    acq_state = scope.acquire();
+    ch1=12; ch2=22; // 1.5*2^3,   1.375*2^4.  Big Endian hexa: 41400000, 41b00000
+    acq_state = scope.acquire();
+    // After this, scope memory is expected to contain
+    // [12, 22, 11, 21], with final_idx=0
+
+    // Expected data dump:
+    const char* dump_exp = 
+        "#time,ch1,ch2\n" //14 chars
+        "00000000\n"
+        "41300000\n"
+        "41a80000\n"
+        "3f800000\n"
+        "41400000\n"
+        "41b00000\n"; // 6 rows of 9 chars = 54, Sum=68
+    // printf("str len: %d\n", (int)strlen(dump_exp)); //len==68
+
+    // Test start: dump scope data
+    char dump[68]; // string to store the dump, which length should be larger than expected dump
+    
+    success &= compare_scope_dump(&scope, dump, dump_exp);
+    
+    return success;
+}
 
 
 /*** Scope demo ***/
@@ -486,6 +548,7 @@ int main(void) {
     success &= test_scope_acquire5();
     success &= test_scope_acquire_notrigger();
     success &= test_scope_dump();
+    success &= test_scope_dump_delay_trig();
 
     if (success) {
         printf("GLOBAL SUCCESS\n");
