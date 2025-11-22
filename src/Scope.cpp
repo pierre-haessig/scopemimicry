@@ -1,7 +1,7 @@
 /**
  * @file
  * @brief Scope: a software oscilloscope library, to record over time the value of selected variables in embedded applications.
- * 
+ *
  * @author Régis Ruelland <regis.ruelland@laas.fr>
  * @author Jean Alinei <jean.alinei@laas.fr>
  * @author Pierre Haessig <pierre.haessig@centralesupelec.fr>
@@ -229,7 +229,7 @@ char* Scope::dump() {
                 uint16_t mem_idx = (_dump_count + get_final_idx() + 1) % _length;
                 int16_t mem_idx_effective = mem_idx * _nb_channel + _dump_channel_idx;
                 sprintf(_dumped_data, "%08x\n", *((uint32_t *) _memory + mem_idx_effective));
-                
+
                 // Next state or sub-state
                 if (_dump_channel_idx < _nb_channel - 1) {
                     _dump_channel_idx +=1; // next channel

@@ -332,11 +332,17 @@ bool test_scope_acquire_notrigger() {
 }
 
 /*** Compare the dump content of a Scope (after record) to an expected dump
- * 
+ *
  * The dump string should be large enough to hold the entire concatenated scope dump.
  */
 bool compare_scope_dump(Scope* scope, char* dump, const char* dump_exp) {
     bool success=true;
+
+    // Safeguard: check that acquisition is finished
+    if (scope->acq_state() != ACQ_DONE) {
+        printf("Unfinished acquisition: scope didn't reached ACQ_DONE");
+        return false;
+    }
 
     scope->init_dump();
 
@@ -374,7 +380,7 @@ bool compare_scope_dump(Scope* scope, char* dump, const char* dump_exp) {
 
 /***  Scope data dump test. Simplest case (immediate trigger, no pretrig).
  * See https://www.h-schmidt.net/FloatConverter/IEEE754.html on how numbers are stored as float32
- * 
+ *
  * note: in principle, Intel and ARM processors stores float numbers in Little Endian format
  * however, the hexademical formatting is done by reading each float32 as an int32
  * which is formatted as a string with the "%08x" format string.
@@ -401,11 +407,14 @@ bool test_scope_dump() {
     acq_state = scope.acquire();
     ch1=12; ch2=22; // 1.5*2^3,   1.375*2^4.  Big Endian hexa: 41400000, 41b00000
     acq_state = scope.acquire();
+    // extra acquire to reach ACQ_DONE state;
+    acq_state = scope.acquire();
+
     // After this, scope memory is expected to contain
     // [10, 20, 11, 21, 12, 22], with final_idx=2
 
     // Expected data dump:
-    const char* dump_exp = 
+    const char* dump_exp =
         "#time,ch1,ch2\n" //14 chars
         "00000000\n"
         "41200000\n"
@@ -421,12 +430,12 @@ bool test_scope_dump() {
     char dump[95]; // string to store the dump, which length should be larger than expected dump
 
     success &= compare_scope_dump(&scope, dump, dump_exp);
-    
+
     return success;
 }
 
 /***  Scope data dump test, with delayed trigger
- * 
+ *
  * This test the case where final_idx != length-1 (i.e. end of buffer)
  * ***/
 bool test_scope_dump_delay_trig() {
@@ -453,11 +462,14 @@ bool test_scope_dump_delay_trig() {
     acq_state = scope.acquire();
     ch1=12; ch2=22; // 1.5*2^3,   1.375*2^4.  Big Endian hexa: 41400000, 41b00000
     acq_state = scope.acquire();
+    // extra acquire to reach ACQ_DONE state;
+    acq_state = scope.acquire();
+
     // After this, scope memory is expected to contain
     // [12, 22, 11, 21], with final_idx=0
 
     // Expected data dump:
-    const char* dump_exp = 
+    const char* dump_exp =
         "#time,ch1,ch2\n" //14 chars
         "00000000\n"
         "41300000\n"
@@ -469,9 +481,9 @@ bool test_scope_dump_delay_trig() {
 
     // Test start: dump scope data
     char dump[68]; // string to store the dump, which length should be larger than expected dump
-    
+
     success &= compare_scope_dump(&scope, dump, dump_exp);
-    
+
     return success;
 }
 
