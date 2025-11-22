@@ -440,7 +440,7 @@ bool test_scope_dump() {
  * ***/
 bool test_scope_dump_delay_trig() {
     bool success=true;
-    printf("Scope data dump test, with delay and trigger...\n");
+    printf("Scope data dump test, with delayed trigger...\n");
 
     // Setup: a short scope acquisition to fill the memory
     const uint16_t length = 2;
@@ -477,6 +477,58 @@ bool test_scope_dump_delay_trig() {
         "3f800000\n"
         "41400000\n"
         "41b00000\n"; // 6 rows of 9 chars = 54, Sum=68
+    // printf("str len: %d\n", (int)strlen(dump_exp)); //len==68
+
+    // Test start: dump scope data
+    char dump[68]; // string to store the dump, which length should be larger than expected dump
+
+    success &= compare_scope_dump(&scope, dump, dump_exp);
+
+    return success;
+}
+
+/***  Scope data dump test, with delayed trigger + pretrig
+ *
+ * This test the case where nbpretrig >0
+ * ***/
+bool test_scope_dump_delay_pretrig() {
+    bool success=true;
+    printf("Scope data dump test, with delayed trigger and pretrig...\n");
+
+    // Setup: a short scope acquisition to fill the memory
+    const uint16_t length = 2;
+    int nb_channels = 2;
+    Scope scope(length, nb_channels, 1.0);
+    scope.set_pretrig_nsamples(1);
+    static float32_t ch1,ch2; // is static needed?
+    scope.connectChannel(ch1, "ch1");
+    scope.connectChannel(ch2, "ch2");
+
+    trig_global = false; // initially false trigger
+    scope.set_trigger(&trig_global_fun);
+
+    ScopeAcqState acq_state;
+    ch1=10; ch2=20; // 1.25*2^3,  1.25*2^4.   Big Endian hexa: 41200000, 41a00000
+    acq_state = scope.acquire();
+
+    trig_global = true; // trigger gets true
+    ch1=11; ch2=21; // 1.375*2^3, 1.3125*2^4. Big Endian hexa: 41300000, 41a80000
+    acq_state = scope.acquire(); // Buffer should be fulled at this stage
+    ch1=12; ch2=22; // 1.5*2^3,   1.375*2^4.  Big Endian hexa: 41400000, 41b00000
+    acq_state = scope.acquire(); // extra acquire to reach ACQ_DONE state;
+
+    // After this, scope memory is expected to contain
+    // [10, 20, 11, 21], with final_idx=2 and trig_idx=1
+
+    // Expected data dump:
+    const char* dump_exp =
+        "#time,ch1,ch2\n" //14 chars
+        "bf800000\n" // t=-1.0
+        "41200000\n"
+        "41a00000\n"
+        "00000000\n" // t= 0.0
+        "41300000\n"
+        "41a80000\n"; // 6 rows of 9 chars = 54, Sum=68
     // printf("str len: %d\n", (int)strlen(dump_exp)); //len==68
 
     // Test start: dump scope data
@@ -561,6 +613,7 @@ int main(void) {
     success &= test_scope_acquire_notrigger();
     success &= test_scope_dump();
     success &= test_scope_dump_delay_trig();
+    success &= test_scope_dump_delay_pretrig();
 
     if (success) {
         printf("GLOBAL SUCCESS\n");
